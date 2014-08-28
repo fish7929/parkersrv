@@ -1,10 +1,12 @@
 class ParkersController < ApplicationController
+	respond_to :json, :xml, :html
   before_action :set_parker, only: [:show, :edit, :update, :destroy]
 
   # GET /parkers
   # GET /parkers.json
   def index
     @parkers = Parker.all
+		respond_with @parkers
   end
 
   # GET /parkers/1
