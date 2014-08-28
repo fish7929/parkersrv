@@ -1,0 +1,49 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Garage name:</strong>
+  <%= @parker.garage_name %>
+</p>
+
+<p>
+  <strong>Point:</strong>
+  <%= @parker.point %>
+</p>
+
+<p>
+  <strong>Total parking spaces:</strong>
+  <%= @parker.total_parking_spaces %>
+</p>
+
+<p>
+  <strong>Remaining parking spaces:</strong>
+  <%= @parker.remaining_parking_spaces %>
+</p>
+
+<p>
+  <strong>Address:</strong>
+  <%= @parker.address %>
+</p>
+
+<p>
+  <strong>Price:</strong>
+  <%= @parker.price %>
+</p>
+
+<p>
+  <strong>Isopen:</strong>
+  <%= @parker.isOpen %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @parker.status %>
+</p>
+
+<p>
+  <strong>Road garage:</strong>
+  <%= @parker.road_garage %>
+</p>
+
+<%= link_to 'Edit', edit_parker_path(@parker) %> |
+<%= link_to 'Back', parkers_path %>

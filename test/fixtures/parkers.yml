@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  garage_name: MyString
+  point: MyString
+  total_parking_spaces: 1
+  remaining_parking_spaces: 1
+  address: MyString
+  price: 1.5
+  isOpen: 1
+  status: MyString
+  road_garage: 1
+
+two:
+  garage_name: MyString
+  point: MyString
+  total_parking_spaces: 1
+  remaining_parking_spaces: 1
+  address: MyString
+  price: 1.5
+  isOpen: 1
+  status: MyString
+  road_garage: 1

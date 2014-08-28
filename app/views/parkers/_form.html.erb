@@ -1,0 +1,53 @@
+<%= form_for(@parker) do |f| %>
+  <% if @parker.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@parker.errors.count, "error") %> prohibited this parker from being saved:</h2>
+
+      <ul>
+      <% @parker.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :garage_name %><br>
+    <%= f.text_field :garage_name %>
+  </div>
+  <div class="field">
+    <%= f.label :point %><br>
+    <%= f.text_field :point %>
+  </div>
+  <div class="field">
+    <%= f.label :total_parking_spaces %><br>
+    <%= f.number_field :total_parking_spaces %>
+  </div>
+  <div class="field">
+    <%= f.label :remaining_parking_spaces %><br>
+    <%= f.number_field :remaining_parking_spaces %>
+  </div>
+  <div class="field">
+    <%= f.label :address %><br>
+    <%= f.text_field :address %>
+  </div>
+  <div class="field">
+    <%= f.label :price %><br>
+    <%= f.text_field :price %>
+  </div>
+  <div class="field">
+    <%= f.label :isOpen %><br>
+    <%= f.number_field :isOpen %>
+  </div>
+  <div class="field">
+    <%= f.label :status %><br>
+    <%= f.text_field :status %>
+  </div>
+  <div class="field">
+    <%= f.label :road_garage %><br>
+    <%= f.number_field :road_garage %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

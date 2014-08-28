@@ -1,0 +1,41 @@
+<h1>Listing parkers</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Garage name</th>
+      <th>Point</th>
+      <th>Total parking spaces</th>
+      <th>Remaining parking spaces</th>
+      <th>Address</th>
+      <th>Price</th>
+      <th>Isopen</th>
+      <th>Status</th>
+      <th>Road garage</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @parkers.each do |parker| %>
+      <tr>
+        <td><%= parker.garage_name %></td>
+        <td><%= parker.point %></td>
+        <td><%= parker.total_parking_spaces %></td>
+        <td><%= parker.remaining_parking_spaces %></td>
+        <td><%= parker.address %></td>
+        <td><%= parker.price %></td>
+        <td><%= parker.isOpen %></td>
+        <td><%= parker.status %></td>
+        <td><%= parker.road_garage %></td>
+        <td><%= link_to 'Show', parker %></td>
+        <td><%= link_to 'Edit', edit_parker_path(parker) %></td>
+        <td><%= link_to 'Destroy', parker, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Parker', new_parker_path %>
