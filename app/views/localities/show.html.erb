@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Uuid:</strong>
+  <%= @locality.uuid %>
+</p>
+
+<p>
+  <strong>Code:</strong>
+  <%= @locality.code %>
+</p>
+
+<p>
+  <strong>Parentid:</strong>
+  <%= @locality.parentId %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @locality.name %>
+</p>
+
+<p>
+  <strong>Garagenum:</strong>
+  <%= @locality.garageNum %>
+</p>
+
+<p>
+  <strong>Level:</strong>
+  <%= @locality.level %>
+</p>
+
+<%= link_to 'Edit', edit_locality_path(@locality) %> |
+<%= link_to 'Back', localities_path %>

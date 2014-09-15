@@ -1,0 +1,31 @@
+<h1>Listing tariffs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Uuid</th>
+      <th>Time range</th>
+      <th>Rates</th>
+      <th>Information</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @tariffs.each do |tariff| %>
+      <tr>
+        <td><%= tariff.uuid %></td>
+        <td><%= tariff.time_range %></td>
+        <td><%= tariff.rates %></td>
+        <td><%= tariff.information %></td>
+        <td><%= link_to 'Show', tariff %></td>
+        <td><%= link_to 'Edit', edit_tariff_path(tariff) %></td>
+        <td><%= link_to 'Destroy', tariff, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Tariff', new_tariff_path %>

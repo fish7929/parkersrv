@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  uuid: MyString
+  time_range: MyString
+  rates: 1.5
+  information_id: 
+
+two:
+  uuid: MyString
+  time_range: MyString
+  rates: 1.5
+  information_id: 

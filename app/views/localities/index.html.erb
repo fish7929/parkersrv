@@ -1,0 +1,35 @@
+<h1>Listing localities</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Uuid</th>
+      <th>Code</th>
+      <th>Parentid</th>
+      <th>Name</th>
+      <th>Garagenum</th>
+      <th>Level</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @localities.each do |locality| %>
+      <tr>
+        <td><%= locality.uuid %></td>
+        <td><%= locality.code %></td>
+        <td><%= locality.parentId %></td>
+        <td><%= locality.name %></td>
+        <td><%= locality.garageNum %></td>
+        <td><%= locality.level %></td>
+        <td><%= link_to 'Show', locality %></td>
+        <td><%= link_to 'Edit', edit_locality_path(locality) %></td>
+        <td><%= link_to 'Destroy', locality, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Locality', new_locality_path %>

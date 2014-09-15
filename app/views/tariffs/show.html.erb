@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Uuid:</strong>
+  <%= @tariff.uuid %>
+</p>
+
+<p>
+  <strong>Time range:</strong>
+  <%= @tariff.time_range %>
+</p>
+
+<p>
+  <strong>Rates:</strong>
+  <%= @tariff.rates %>
+</p>
+
+<p>
+  <strong>Information:</strong>
+  <%= @tariff.information %>
+</p>
+
+<%= link_to 'Edit', edit_tariff_path(@tariff) %> |
+<%= link_to 'Back', tariffs_path %>

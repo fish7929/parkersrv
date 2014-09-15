@@ -1,0 +1,41 @@
+<%= form_for(@information) do |f| %>
+  <% if @information.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@information.errors.count, "error") %> prohibited this information from being saved:</h2>
+
+      <ul>
+      <% @information.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :uuid %><br>
+    <%= f.text_field :uuid %>
+  </div>
+  <div class="field">
+    <%= f.label :garage_name %><br>
+    <%= f.text_field :garage_name %>
+  </div>
+  <div class="field">
+    <%= f.label :total_parking_space %><br>
+    <%= f.number_field :total_parking_space %>
+  </div>
+  <div class="field">
+    <%= f.label :position %><br>
+    <%= f.number_field :position %>
+  </div>
+  <div class="field">
+    <%= f.label :longitude %><br>
+    <%= f.text_field :longitude %>
+  </div>
+  <div class="field">
+    <%= f.label :latitude %><br>
+    <%= f.text_field :latitude %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

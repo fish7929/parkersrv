@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  uuid: MyString
+  code: MyString
+  parentId: MyString
+  name: MyString
+  garageNum: MyString
+  level: 1
+
+two:
+  uuid: MyString
+  code: MyString
+  parentId: MyString
+  name: MyString
+  garageNum: MyString
+  level: 1

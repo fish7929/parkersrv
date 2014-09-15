@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Uuid:</strong>
+  <%= @event.uuid %>
+</p>
+
+<p>
+  <strong>Rom num:</strong>
+  <%= @event.rom_num %>
+</p>
+
+<p>
+  <strong>Event:</strong>
+  <%= @event.event %>
+</p>
+
+<p>
+  <strong>Last time:</strong>
+  <%= @event.last_time %>
+</p>
+
+<%= link_to 'Edit', edit_event_path(@event) %> |
+<%= link_to 'Back', events_path %>

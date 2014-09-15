@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  uuid: MyString
+  rom_num: MyString
+  event: MyString
+  last_time: 2014-09-15 06:53:58
+
+two:
+  uuid: MyString
+  rom_num: MyString
+  event: MyString
+  last_time: 2014-09-15 06:53:58

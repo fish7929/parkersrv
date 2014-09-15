@@ -11,7 +11,38 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140827084034) do
+ActiveRecord::Schema.define(version: 20140915071148) do
+
+  create_table "events", force: true do |t|
+    t.string   "uuid"
+    t.string   "rom_num"
+    t.string   "event"
+    t.datetime "last_time"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "information", force: true do |t|
+    t.string   "uuid"
+    t.string   "garage_name"
+    t.integer  "total_parking_space"
+    t.integer  "position"
+    t.string   "longitude"
+    t.string   "latitude"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "localities", force: true do |t|
+    t.string   "uuid"
+    t.string   "code"
+    t.string   "parentId"
+    t.string   "name"
+    t.string   "garageNum"
+    t.integer  "level"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "parkers", force: true do |t|
     t.string   "garage_name"
@@ -26,5 +57,33 @@ ActiveRecord::Schema.define(version: 20140827084034) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "statuses", force: true do |t|
+    t.string   "uuid"
+    t.string   "garage_num"
+    t.string   "parking_num"
+    t.string   "rom_num"
+    t.string   "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "t_prov_city_area_street", force: true do |t|
+    t.string  "code",     limit: 11
+    t.string  "parentId", limit: 11
+    t.string  "name",     limit: 50
+    t.boolean "level"
+  end
+
+  create_table "tariffs", force: true do |t|
+    t.string   "uuid"
+    t.string   "time_range"
+    t.float    "rates",          limit: 24
+    t.integer  "information_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "tariffs", ["information_id"], name: "index_tariffs_on_information_id", using: :btree
 
 end

@@ -1,4 +1,14 @@
 Rails.application.routes.draw do
+  resources :statuses
+
+  resources :events
+
+  resources :tariffs
+
+  resources :information
+
+  resources :localities
+
   resources :parkers
 
   # The priority is based upon order of creation: first created -> highest priority.
