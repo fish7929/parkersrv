@@ -1,10 +1,12 @@
 class InformationController < ApplicationController
+  respond_to :json, :xml, :html
   before_action :set_information, only: [:show, :edit, :update, :destroy]
 
   # GET /information
   # GET /information.json
   def index
     @information = Information.all
+		respond_with @information
   end
 
   # GET /information/1
@@ -69,6 +71,6 @@ class InformationController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def information_params
-      params.require(:information).permit(:uuid, :garage_name, :total_parking_space, :position, :longitude, :latitude)
+      params.require(:information).permit(:image, :garage_name, :total_parking_space, :position, :longitude, :latitude)
     end
 end

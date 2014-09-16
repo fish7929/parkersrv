@@ -1,11 +1,15 @@
 Rails.application.routes.draw do
+  get 'welcome/index'
+
   resources :statuses
 
   resources :events
 
-  resources :tariffs
+# resources :tariffs
 
-  resources :information
+  resources :information do
+		resources :tariffs
+	end
 
   resources :localities
 
@@ -15,7 +19,7 @@ Rails.application.routes.draw do
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
-  # root 'welcome#index'
+  root 'welcome#index'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

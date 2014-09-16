@@ -16,7 +16,7 @@
   <tbody>
     <% @information.each do |information| %>
       <tr>
-        <td><%= information.uuid %></td>
+        <td><%= image_tag information.image.url(:square) %></td>
         <td><%= information.garage_name %></td>
         <td><%= information.total_parking_space %></td>
         <td><%= information.position %></td>

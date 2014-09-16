@@ -1,0 +1,370 @@
+﻿<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+		<script type="text/javascript" src="http://api.map.baidu.com/api?ak=eVNrME420wABlTipUzTN4LAs&v=2.0"></script>
+	</head>
+	<body>
+		<!--标题LOGO-->
+		<div id="logo">
+			<img src="/assets/img/logo.png"/>
+			<div>
+				<a href="">ParkVille</a>|<a href="">Logout</a>
+			</div>
+		</div>
+		<!--左侧导航栏-->
+		<div id="leftNav">
+			<ul>
+				<li id="home">Home</li>
+				<li id="occupancy">Occupancy</li>
+				<li id="analytics">Analytics</li>
+			</ul>
+		</div>
+		<!--首页内容-->
+		<div id="homeContent">
+			<div class="analytics-top">
+				<div class="search">
+					<input type="text" id="searchTxt" />
+					<button id="searchBtn">搜索</button>
+				</div>
+				<span id="mapCurrentTime">aaaa</span>
+			</div>
+			<div id="mapCanvas">
+				不支持地图显示
+			</div>
+		</div>
+		<!--车库数据内容-->
+		<div id="analyticsContent">
+			<div class="analytics-top">
+				<!--切换柱状图和表格分析-->
+				<select id="changeOccupancy">
+					<option value="occupied" >Occupied Stauts</option>
+					<option value="idle">Idle Status</option>
+				</select>
+				<!--切换柱状图和表格分析-->
+				<select id="changeTable">
+					<option value="turnover" selected>Turnover By Day & Week</option>
+					<option value="occupancy">Occupancy By Hour & Block Face</option>
+				</select>
+				<span id="currentTime">aaaa</span>
+			</div>
+			
+			<div id="operationBtn">
+				<a href="#"><img src="/assets/img/refresh.png"/></a>
+			</div>
+			
+			<div id="analyticsData">
+				<h3>Turnover By Day & Week</h3>
+				<!--柱状图分析-->
+				<div id="chart"></div>
+				<!--表格分析-->
+				<div id="analytics-occupancy">
+					<table class="scrollable" id="analyticsTable">
+						<thead>
+							<tr>
+								<th>&nbsp;</th>
+								<th>8am</th>
+								<th>9am</th>
+								<th>10am</th>
+								<th>11am</th>
+								<th>12pm</th>
+								<th>1pm</th>
+								<th>2pm</th>
+								<th>3pm</th>
+								<th>4pm</th>
+								<th>5pm</th>
+								<th>6pm</th>
+								<th>7pm</th>
+								<th>8pm</th>
+								<th>9pm</th>
+								<th>10pm-8am</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>竹柏路333弄</td>
+								<td>21%</td>
+								<td>34%</td>
+								<td>53%</td>
+								<td>63%</td>
+								<td>71%</td>
+								<td>74%</td>
+								<td>71%</td>
+								<td>56%</td>
+								<td>64%</td>
+								<td>58%</td>
+								<td>71%</td>
+								<td>57%</td>
+								<td>23%</td>
+								<td>45%</td>
+								<td>36%</td>
+							</tr>
+							<tr>
+								<td>竹柏路333弄</td>
+								<td>21%</td>
+								<td>34%</td>
+								<td>53%</td>
+								<td>63%</td>
+								<td>71%</td>
+								<td>74%</td>
+								<td>71%</td>
+								<td>56%</td>
+								<td>64%</td>
+								<td>58%</td>
+								<td>71%</td>
+								<td>57%</td>
+								<td>23%</td>
+								<td>45%</td>
+								<td>36%</td>
+							</tr>
+							<tr>
+								<td>竹柏路366弄</td>
+								<td>21%</td>
+								<td>34%</td>
+								<td>53%</td>
+								<td>63%</td>
+								<td>71%</td>
+								<td>74%</td>
+								<td>71%</td>
+								<td>56%</td>
+								<td>64%</td>
+								<td>58%</td>
+								<td>71%</td>
+								<td>57%</td>
+								<td>23%</td>
+								<td>45%</td>
+								<td>36%</td>
+							</tr>
+							<tr>
+								<td>竹柏路100弄</td>
+								<td>21%</td>
+								<td>34%</td>
+								<td>53%</td>
+								<td>63%</td>
+								<td>71%</td>
+								<td>74%</td>
+								<td>71%</td>
+								<td>56%</td>
+								<td>64%</td>
+								<td>58%</td>
+								<td>71%</td>
+								<td>57%</td>
+								<td>23%</td>
+								<td>45%</td>
+								<td>36%</td>
+							</tr>
+							<tr>
+								<td>竹柏路111弄</td>
+								<td>21%</td>
+								<td>34%</td>
+								<td>53%</td>
+								<td>63%</td>
+								<td>71%</td>
+								<td>74%</td>
+								<td>71%</td>
+								<td>56%</td>
+								<td>64%</td>
+								<td>58%</td>
+								<td>71%</td>
+								<td>57%</td>
+								<td>23%</td>
+								<td>45%</td>
+								<td>36%</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<!--车库占位表格-->
+			<div id="occupancyContent">
+				<table class="scrollable" id="occupancyTable">
+					<thead>
+						<tr>
+							<th>&nbsp;</th>
+							<th>1</th>
+							<th>2</th>
+							<th>3</th>
+							<th>4</th>
+							<th>5</th>
+							<th>6</th>
+							<th>7</th>
+							<th>8</th>
+							<th>9</th>
+							<th>10</th>
+							<th>11</th>
+							<th>12</th>
+							<th>13</th>
+							<th>14</th>
+							<th>15</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>竹柏路333弄</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>空</td>
+							<td>空</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>空</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>忙</td>
+						</tr>
+						<tr>
+							<td>竹柏路333弄</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>空</td>
+							<td>空</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>缺</td>
+							<td>缺</td>
+							<td>缺</td>
+							<td>缺</td>
+						</tr>
+						<tr>
+							<td>竹柏路366弄</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>空</td>
+							<td>空</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>空</td>
+							<td>空</td>
+							<td>缺</td>
+							<td>缺</td>
+						</tr>
+						<tr>
+							<td>竹柏路100弄</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>空</td>
+							<td>空</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>空</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>忙</td>
+						</tr>
+						<tr>
+							<td>竹柏路111弄</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>空</td>
+							<td>空</td>
+							<td>空</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>忙</td>
+							<td>缺</td>
+							<td>缺</td>
+							<td>缺</td>
+							<td>缺</td>
+							<td>缺</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<div id="tabControl">
+				<p>Provinces</p>
+				<select id="provinces">
+					<option>(All)</option>
+				</select>
+				<p>City</p>
+				<select id="city">
+					<option>(All)</option>
+				</select>
+				<p>Areas</p>
+				<select id="areas">
+					<option>(All)</option>
+				</select>
+				<p>Blocks</p>
+				<select id="blocks">
+					<option>(All)</option>
+				</select>
+				<p>Date Range</p>
+				<div id="rangeSlider"></div>
+				<p>Hours</p>
+				<select id="hours">
+					<option >(Multiple values)</option>
+					<option>1</option>
+				</select>
+				<p>Days</p>
+				<select id="days">
+					<option>(All)</option>
+					<option>1</option>
+				</select>
+				<div id="weekStarting">
+					<p>Week Starting</p>
+					<p>
+						<label class="colorLbl blue">&nbsp;</label>
+						<label id="firstWeek">1/5/2014</label>
+					</p>
+					<p>
+						<label class="colorLbl orange">&nbsp;</label>
+						<label id="secondWeek">1/12/2014</label>
+					</p>
+					<p>
+						<label class="colorLbl taupeBrown">&nbsp;</label>
+						<label id="thirdWeek">1/19/2014</label>
+					</p>
+					<p>
+						<label class="colorLbl green">&nbsp;</label>
+						<label id="fourthWeek">1/26/2014</label>
+					</p>
+				</div>
+				<div id="tabOccupancy">
+					<p>Occupancy</p>
+					<label >8%</label>
+					<label class="colorRange">&nbsp;</label>
+					<label class="restore">95%</label>
+				</div>
+				<div id="status">
+					<p>Status</p>
+					<p>
+						<label class="colorLbl darkGreen">&nbsp;</label>
+						<label >空闲</label>
+					</p>
+					<p>
+						<label class="colorLbl red">&nbsp;</label>
+						<label >繁忙</label>
+					</p>
+					<p>
+						<label class="colorLbl darkGray">&nbsp;</label>
+						<label >空缺</label>
+					</p>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
