@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
   before_action :set_event, only: [:show, :edit, :update, :destroy]
-
+	skip_before_filter :verify_authenticity_token, :only => [:create]
   # GET /events
   # GET /events.json
   def index
@@ -25,7 +25,6 @@ class EventsController < ApplicationController
   # POST /events.json
   def create
     @event = Event.new(event_params)
-
     respond_to do |format|
       if @event.save
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
@@ -69,6 +68,6 @@ class EventsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def event_params
-      params.require(:event).permit(:uuid, :rom_num, :event, :last_time)
+      params.require(:event).permit(:rom_num, :event, :last_time)
     end
 end

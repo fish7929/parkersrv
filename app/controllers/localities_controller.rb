@@ -1,11 +1,26 @@
 class LocalitiesController < ApplicationController
-  before_action :set_locality, only: [:show, :edit, :update, :destroy]
+  respond_to :json, :xml, :html
+	before_action :set_locality, only: [:show, :edit, :update, :destroy]
+
 
   # GET /localities
   # GET /localities.json
   def index
-    @localities = Locality.all
+		level = params[:level]
+		parentId = params[:parentId]
+		if level == nil
+			@localities = Locality.all
+		else
+#	@localities = Locality.select(:code, :parentId ,:name).where(level: level).all
+			if parentId == nil
+				@localities = Locality.where(level: level).all
+			else
+				@localities = Locality.where("level = ? AND parentId = ?", level, parentId).all
+			end
+		end
+		respond_with @localities
   end
+
 
   # GET /localities/1
   # GET /localities/1.json

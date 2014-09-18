@@ -69,6 +69,6 @@ class StatusesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def status_params
-      params.require(:status).permit(:uuid, :garage_num, :parking_num, :rom_num, :status)
+      params.require(:status).permit(:garage_num, :parking_num, :rom_num, :status)
     end
 end

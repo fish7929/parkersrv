@@ -15,24 +15,138 @@ var markerArr = [{garage_name:"宜浩佳园",total_parking_spaces: 480,remaining
 var geolocation = new BMap.Geolocation();
 //通过百度地图获取当前位置
 var point = new BMap.Point(121.480241,31.236303);
-var areas = [];
+var provincesData = [];
+var cityData = [];
+var areasData = [];
+var blocksData = [];
+
+//加载省份信息
+function getProvinces(provincesId, cityId, areasId, blocksId){
+	provincesId.find("option").length = 0;
+	$.ajax({
+		type:"GET",
+		dataType:'json',
+		url:"/localities.json?level=1",
+		success:function(data){
+			for (var i = 0; i < data.length; i++){
+				provincesId.append(new Option(data[i].name,data[i].code)); 
+			}
+			if(provincesId.find("option").length == 0) { 
+				provincesId.disabled = true; 
+				provincesId.append(new Option("","00")); 
+			}else{
+				provincesId.disabled = false;
+			}
+			provincesId.get(0).selectedIndex = 9;
+			getCity(cityId, areasId, blocksId, provincesId.find('option:selected').val());
+		},
+		error: function(){
+			alert ("请求发送失败，请稍候再试");
+		}
+	});
+	
+	
+}
+//加载城市信息
+function getCity(cityId, areasId, blocksId, parentId){
+	cityId.find("option").length = 0;
+	alert(parentId);
+	$.ajax({
+		type:"GET",
+		dataType:'json',
+		url:"/localities.json?level=2&parentId="+parentId,
+		success:function(data){
+			
+			for (var i = 0; i < data.length; i++){
+				cityId.append(new Option(data[i].name,data[i].code)); 
+			}
+			if(cityId.find("option").length == 0) { 
+				cityId.disabled = true; 
+				cityId.append(new Option("","0000")); 
+			}else{
+				cityId.disabled = false;
+			}
+			cityId.get(0).selectedIndex = 1;
+			getAreas(areasId, blocksId, cityId.find('option:selected').val());
+		},
+		error: function(){
+			alert ("请求发送失败，请稍候再试");
+		}
+	});
+}
+//加载区域信息
+function getAreas(areasId, blocksId, parentId){
+	areasId.find("option").length = 0; 
+	alert(parentId);
+	$.ajax({
+		type:"GET",
+		dataType:'json',
+		url:"/localities.json?level=3&parentId="+parentId,
+		success:function(data){
+			for (var i = 0; i < data.length; i++){
+				areasId.append(new Option(data[i].name,data[i].code)); 
+			}
+			if(areasId.find("option").length == 0) { 
+				areasId.disabled = true; 
+				areasId.append(new Option("","000000")); 
+			}else{
+				areasId.disabled = false;
+			}
+			areasId.get(0).selectedIndex = 1;
+			getBlocks(blocksId, areasId.find('option:selected').val());
+		},
+		error: function(){
+			alert ("请求发送失败，请稍候再试");
+		}
+	});
+}
+//加载街道信息
+function getBlocks(blocksId, parentId){
+	blocksId.find("option").length = 0;
+	alert(parentId);
+	$.ajax({
+		type:"GET",
+		dataType:'json',
+		url:"/localities.json?level=4&parentId="+parentId,
+		success:function(data){
+			//alert("block  " + JSON.stringify(data));
+			for (var i = 0; i < data.length; i++){
+				blocksId.append(new Option(data[i].name,data[i].code)); 
+			}
+			if(blocksId.find("option").length == 0) { 
+				blocksId.disabled = true; 
+				blocksId.append(new Option("","000000")); 
+			}else{
+				blocksId.disabled = false;
+			}
+			blocksId.get(0).selectedIndex = 1;
+		},
+		error: function(){
+			alert ("请求发送失败，请稍候再试");
+		}
+	});
+}
+//加载省市区街道信息
+function loadLocalityContent(provinces, city, areas, blocks){
+	getProvinces(provinces, city, areas, blocks);
+	//getCity(city, provinces.val());
+	//getCity(city, provinces.find('option:selected').val());
+	//getAreas(areas, city.val());
+	//getAreas(areas, city.find('option:selected').val());
+	//getBlocks(blocks, areas.val());
+	//getBlocks(blocks, areas.find('option:selected').val());
+}
 
 $(document).ready(function(){
 	setVisibleHeight();
 	//设置显示当天的时间
 	showCurrentTime($("#mapCurrentTime"));
 	initMap(point);
-	/*
-	geolocation.getCurrentPosition(function(r){
-		if(this.getStatus() == BMAP_STATUS_SUCCESS){
-			//initMap(r.point);
-			map.panTo(r.point, {noAnimation : false});
-		}
-	});
-	*/
-	/*左侧导航栏*/
 	//显示地图主页
 	setVisibleHeight();
+	//获取位置信息
+	loadLocalityContent($("#provinces"), $("#city"), $("#areas"), $("#blocks"));
+	/*左侧导航栏*/
 	$("#home").click(function(e){
 		revertBackgroundAndColor();
 		setBackgroundAndColor($(this));
@@ -161,6 +275,21 @@ $(document).ready(function(){
 	});
 	
 	
+	/*切换选择省市区*/
+	$("#provinces").change(function(){
+		getCity(city, provinces.find('option:selected').val());
+		getAreas(areas, city.find('option:selected').val());
+		getBlocks(blocks, areas.find('option:selected').val());
+	
+	});
+	$("#city").change(function(){
+		getAreas(areas, city.find('option:selected').val());
+		getBlocks(blocks, areas.find('option:selected').val());
+	});
+	$("#areas").change(function(){
+		getBlocks(blocks, areas.find('option:selected').val());
+	});
+	
 });
 //设置导航栏li的背景色与前景色
 function setBackgroundAndColor(id){
@@ -254,19 +383,19 @@ function createMarker(arr){
 		var iconImg;
 		if (json.road_garage == 1) {
 			if(json.status == "idle"){
-				iconImg = createIcon("./img/green.png");
+				iconImg = createIcon("/assets/img/green.png");
 			}else if (json.status == "busy") {
-				iconImg = createIcon("./img/orange.png");
+				iconImg = createIcon("/assets/img/orange.png");
 			}else if (json.status == "nervous") {
-				iconImg = createIcon("./img/red.png");
+				iconImg = createIcon("/assets/img/red.png");
 			}else{
-				iconImg = createIcon("./img/gray.png");
+				iconImg = createIcon("/assets/img/gray.png");
 			}
 		}else{
 			if(json.status == "idle"){
-				iconImg = createIcon("./img/green_p.png");
+				iconImg = createIcon("/assets/img/green_p.png");
 			}else{
-				iconImg = createIcon("./img/gray_p.png");
+				iconImg = createIcon("/assets/img/gray_p.png");
 			}
 		}
 		var marker = new BMap.Marker(point,{icon:iconImg});
@@ -372,7 +501,7 @@ LocationControl.prototype.initialize = function(map){
   var div = document.createElement("div");
   // 添加图片
   var img = document.createElement("img");
-  img.src = "img/location.png";
+  img.src = "/assets/img/location.png";
   div.appendChild(img);
   // 设置样式
   div.style.cursor = "pointer";
@@ -401,7 +530,7 @@ LocationControl.prototype.initialize = function(map){
 function addPositionMarker(point){
 	var circle = new BMap.Circle(point,100,{strokeColor:"green", fillColor:"green", strokeWeight:1, strokeOpacity:0.2, fillOpacity:0.2}); //创建圆
 	map.addOverlay(circle);
-	var myIcon = new BMap.Icon("img/position.png",new BMap.Size(30, 30)); 
+	var myIcon = new BMap.Icon("/assets/img/position.png",new BMap.Size(30, 30)); 
 	var mk = new BMap.Marker(point, {icon: myIcon});
 	map.addOverlay(mk);
 }
