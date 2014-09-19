@@ -11,7 +11,7 @@ Rails.application.routes.draw do
 		resources :tariffs
 	end
 
-  resources :localities
+  resources :localities 
 
   resources :parkers
 

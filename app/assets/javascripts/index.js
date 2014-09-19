@@ -15,10 +15,7 @@ var markerArr = [{garage_name:"宜浩佳园",total_parking_spaces: 480,remaining
 var geolocation = new BMap.Geolocation();
 //通过百度地图获取当前位置
 var point = new BMap.Point(121.480241,31.236303);
-var provincesData = [];
-var cityData = [];
-var areasData = [];
-var blocksData = [];
+
 
 //加载省份信息
 function getProvinces(provincesId, cityId, areasId, blocksId){
@@ -109,7 +106,6 @@ function getBlocks(blocksId, parentId){
 		dataType:'json',
 		url:"/localities.json?level=4&parentId="+parentId,
 		success:function(data){
-			//alert("block  " + JSON.stringify(data));
 			for (var i = 0; i < data.length; i++){
 				blocksId.append(new Option(data[i].name,data[i].code)); 
 			}
@@ -129,12 +125,6 @@ function getBlocks(blocksId, parentId){
 //加载省市区街道信息
 function loadLocalityContent(provinces, city, areas, blocks){
 	getProvinces(provinces, city, areas, blocks);
-	//getCity(city, provinces.val());
-	//getCity(city, provinces.find('option:selected').val());
-	//getAreas(areas, city.val());
-	//getAreas(areas, city.find('option:selected').val());
-	//getBlocks(blocks, areas.val());
-	//getBlocks(blocks, areas.find('option:selected').val());
 }
 
 $(document).ready(function(){
@@ -159,16 +149,6 @@ $(document).ready(function(){
 		showContent($("#homeContent"));
 		
 		initMap(point);
-		
-		//通过百度地图获取当前位置
-		/*
-		geolocation.getCurrentPosition(function(r){
-			if(this.getStatus() == BMAP_STATUS_SUCCESS){
-				//initMap(r.point);
-				map.panTo(r.point, {noAnimation : false});
-			}
-		});
-		*/
 	});
 	//显示停车空闲数据
 	$("#occupancy").click(function(e){
@@ -277,17 +257,14 @@ $(document).ready(function(){
 	
 	/*切换选择省市区*/
 	$("#provinces").change(function(){
-		getCity(city, provinces.find('option:selected').val());
-		getAreas(areas, city.find('option:selected').val());
-		getBlocks(blocks, areas.find('option:selected').val());
+		getCity($("#city"), $("#areas"), $("#blocks"), $("#provinces").find('option:selected').val());
 	
 	});
 	$("#city").change(function(){
-		getAreas(areas, city.find('option:selected').val());
-		getBlocks(blocks, areas.find('option:selected').val());
+		getAreas($("#areas"), $("#blocks"), $("#city").find('option:selected').val());
 	});
 	$("#areas").change(function(){
-		getBlocks(blocks, areas.find('option:selected').val());
+		getBlocks($("#blocks"), $("#areas").find('option:selected').val());
 	});
 	
 });
