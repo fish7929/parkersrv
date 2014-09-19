@@ -18,8 +18,7 @@ var point = new BMap.Point(121.480241,31.236303);
 
 
 //加载省份信息
-function getProvinces(provincesId, cityId, areasId, blocksId){
-	provincesId.find("option").length = 0;
+function getProvinces(provincesId, cityId){
 	$.ajax({
 		type:"GET",
 		dataType:'json',
@@ -28,14 +27,6 @@ function getProvinces(provincesId, cityId, areasId, blocksId){
 			for (var i = 0; i < data.length; i++){
 				provincesId.append(new Option(data[i].name,data[i].code)); 
 			}
-			if(provincesId.find("option").length == 0) { 
-				provincesId.disabled = true; 
-				provincesId.append(new Option("","00")); 
-			}else{
-				provincesId.disabled = false;
-			}
-			provincesId.get(0).selectedIndex = 9;
-			getCity(cityId, areasId, blocksId, provincesId.find('option:selected').val());
 		},
 		error: function(){
 			alert ("请求发送失败，请稍候再试");
@@ -44,10 +35,11 @@ function getProvinces(provincesId, cityId, areasId, blocksId){
 	
 	
 }
-//加载城市信息
-function getCity(cityId, areasId, blocksId, parentId){
-	cityId.find("option").length = 0;
-	alert(parentId);
+//加载城市信息,改变Provinces下拉框的事件
+function changeProvinces(cityId,areasId, blocksId, parentId){
+	cityId.html ("<option value=\"0000\">(All)</option>");
+	areasId.html ("<option value=\"000000\">(All)</option>");
+	blocksId.html ("<option value=\"00000000\">(All)</option>");
 	$.ajax({
 		type:"GET",
 		dataType:'json',
@@ -57,24 +49,24 @@ function getCity(cityId, areasId, blocksId, parentId){
 			for (var i = 0; i < data.length; i++){
 				cityId.append(new Option(data[i].name,data[i].code)); 
 			}
-			if(cityId.find("option").length == 0) { 
-				cityId.disabled = true; 
-				cityId.append(new Option("","0000")); 
+			cityId.prop("disabled", false);
+			/*
+			if(cityId.find("option").length <= 1) { 
+				areasId.prop("disabled", true);
 			}else{
-				cityId.disabled = false;
+				areasId.prop("disabled", false);
 			}
-			cityId.get(0).selectedIndex = 1;
-			getAreas(areasId, blocksId, cityId.find('option:selected').val());
+			*/
 		},
 		error: function(){
 			alert ("请求发送失败，请稍候再试");
 		}
 	});
 }
-//加载区域信息
-function getAreas(areasId, blocksId, parentId){
-	areasId.find("option").length = 0; 
-	alert(parentId);
+//加载区域信息,改变city下拉框的事件
+function changeCity(areasId, blocksId, parentId){
+	areasId.html ("<option value=\"000000\">(All)</option>");
+	blocksId.html ("<option value=\"00000000\">(All)</option>");
 	$.ajax({
 		type:"GET",
 		dataType:'json',
@@ -83,24 +75,23 @@ function getAreas(areasId, blocksId, parentId){
 			for (var i = 0; i < data.length; i++){
 				areasId.append(new Option(data[i].name,data[i].code)); 
 			}
-			if(areasId.find("option").length == 0) { 
-				areasId.disabled = true; 
-				areasId.append(new Option("","000000")); 
+			areasId.prop("disabled", false); 
+			/*
+			if(areasId.find("option").length <= 1) {
+				blocksId.prop("disabled", true); 
 			}else{
-				areasId.disabled = false;
+				blocksId.prop("disabled", false); 
 			}
-			areasId.get(0).selectedIndex = 1;
-			getBlocks(blocksId, areasId.find('option:selected').val());
+			*/
 		},
 		error: function(){
 			alert ("请求发送失败，请稍候再试");
 		}
 	});
 }
-//加载街道信息
-function getBlocks(blocksId, parentId){
-	blocksId.find("option").length = 0;
-	alert(parentId);
+//加载街道信息改变areas下拉框的事件
+function changeAreas(blocksId, parentId){
+	blocksId.html ("<option value=\"00000000\">(All)</option>");
 	$.ajax({
 		type:"GET",
 		dataType:'json',
@@ -109,13 +100,7 @@ function getBlocks(blocksId, parentId){
 			for (var i = 0; i < data.length; i++){
 				blocksId.append(new Option(data[i].name,data[i].code)); 
 			}
-			if(blocksId.find("option").length == 0) { 
-				blocksId.disabled = true; 
-				blocksId.append(new Option("","000000")); 
-			}else{
-				blocksId.disabled = false;
-			}
-			blocksId.get(0).selectedIndex = 1;
+			blocksId.prop("disabled", false); 
 		},
 		error: function(){
 			alert ("请求发送失败，请稍候再试");
@@ -124,7 +109,14 @@ function getBlocks(blocksId, parentId){
 }
 //加载省市区街道信息
 function loadLocalityContent(provinces, city, areas, blocks){
-	getProvinces(provinces, city, areas, blocks);
+	provinces.html ("<option value=\"00\">(All)</option>");
+	city.html ("<option value=\"0000\">(All)</option>");
+	areas.html ("<option value=\"000000\">(All)</option>");
+	blocks.html ("<option value=\"00000000\">(All)</option>");
+	getProvinces(provinces, city);
+	city.prop("disabled", true);
+	areas.prop("disabled", true);
+	blocks.prop("disabled", true);
 }
 
 $(document).ready(function(){
@@ -257,14 +249,14 @@ $(document).ready(function(){
 	
 	/*切换选择省市区*/
 	$("#provinces").change(function(){
-		getCity($("#city"), $("#areas"), $("#blocks"), $("#provinces").find('option:selected').val());
+		changeProvinces($("#city"), $("#areas"), $("#blocks"), $(this).find('option:selected').val());
 	
 	});
 	$("#city").change(function(){
-		getAreas($("#areas"), $("#blocks"), $("#city").find('option:selected').val());
+		changeCity($("#areas"), $("#blocks"), $(this).find('option:selected').val());
 	});
 	$("#areas").change(function(){
-		getBlocks($("#blocks"), $("#areas").find('option:selected').val());
+		changeAreas($("#blocks"), $(this).find('option:selected').val());
 	});
 	
 });
