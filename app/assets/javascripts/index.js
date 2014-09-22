@@ -259,6 +259,55 @@ $(document).ready(function(){
 		changeAreas($("#blocks"), $(this).find('option:selected').val());
 	});
 	
+	
+	//滑动日期区间，更改label的显示值
+	$("#rangeSlider").on("valuesChanged", function(e, data){
+		var weeKday = data.values.min.getDay();
+		var year = data.values.min.getFullYear();
+		var month = data.values.min.getMonth()+1;
+		var date = data.values.min.getDate();
+		var days = getDaysInMonth(year, month);
+		if ( weeKday == 0){
+			$("#firstWeek").text(month+"/"+date+"/"+year);
+			if (date+7 > days){
+				$("#secondWeek").text((month+1) + "/"+(date+7 - days)+"/"+year);
+			}else{
+				$("#secondWeek").text(month + "/"+(date+7)+"/"+year);
+			}
+			if (date+14 > days){
+				$("#thirdWeek").text((month+1) + "/"+(date+14 - days)+"/"+year);
+			}else{
+				$("#thirdWeek").text(month + "/"+(date+14)+"/"+year);
+			}
+			if (date+21 > days){
+				$("#fourthWeek").text((month+1) + "/"+(date+21 - days)+"/"+year);
+			}else{
+				$("#fourthWeek").text(month + "/"+(date+21)+"/"+year);
+			}
+		}else{
+			if(date+7-weeKday > days){
+				$("#firstWeek").text((month+1) + "/"+(date+7-weeKday - days)+"/"+year);
+			}else{
+				$("#firstWeek").text(month + "/"+(date+7-weeKday)+"/"+year);
+			}
+			if(date+14-weeKday > days){
+				$("#secondWeek").text((month+1) + "/"+(date+14-weeKday - days)+"/"+year);
+			}else{
+				$("#secondWeek").text(month + "/"+(date+14-weeKday)+"/"+year);
+			}
+			if(date+21-weeKday > days){
+				$("#thirdWeek").text((month+1) + "/"+(date+21-weeKday - days)+"/"+year);
+			}else{
+				$("#thirdWeek").text(month + "/"+(date+21-weeKday)+"/"+year);
+			}
+			if(date+28-weeKday > days){
+				$("#fourthWeek").text((month+1) + "/"+(date+28-weeKday - days)+"/"+year);
+			}else{
+				$("#fourthWeek").text(month + "/"+(date+28-weeKday)+"/"+year);
+			}
+		}
+    });
+	
 });
 //设置导航栏li的背景色与前景色
 function setBackgroundAndColor(id){
@@ -578,5 +627,9 @@ function setVisibleHeight(){
 function setBackgroundColor(id, colorName){
 	id.css("background-color", colorName);
 }
-
+//获取某年某月的总天数JS里面的new Date("xxxx/xx/xx")这个日期的构造方法有一个妙处，当你传入的是"xxxx/xx/0"（0号）的话，得到的日期是"xx"月的最后一天
+function getDaysInMonth(year,month){ 
+	var temp = new Date(year,month,0);
+	return temp.getDate(); 
+} 
 
