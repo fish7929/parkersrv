@@ -1,17 +1,4 @@
-﻿var roadMarkerArr = [{garage_name:"临港软件园",total_parking_spaces: 360,remaining_parking_spaces:120,address:"环湖西一路99号", price: 5.0,status:"busy", point:"121.931348|30.906358", isOpen:0, road_garage:1},
-					{garage_name:"临港软件园",total_parking_spaces: 280,remaining_parking_spaces:220,address:"环湖西一路99号", price: 5.0,status:"idle", point:"121.931689|30.907837", isOpen:0, road_garage:1},
-					{garage_name:"临港软件园",total_parking_spaces: 150,remaining_parking_spaces:10,address:"环湖西一路99号", price: 5.0,status:"nervous", point:"121.934011|30.909166", isOpen:0, road_garage:1},
-					{garage_name:"临港软件园",total_parking_spaces: 60,remaining_parking_spaces:0,address:"环湖西一路99号", price: 5.0,status:"full", point:"121.93296|30.904812", isOpen:0, road_garage:1}
-					];
-					
-var markerArr = [{garage_name:"宜浩佳园",total_parking_spaces: 480,remaining_parking_spaces:160,address:"竹柏路366弄", price: 10.0,status:"idle", point:"121.915811|30.908283", isOpen:0, road_garage:0},
-				{garage_name:"宜浩佳园",total_parking_spaces: 430,remaining_parking_spaces:0,address:"竹柏路333弄", price: 10.0,status:"full", point:"121.915757|30.905947", isOpen:0, road_garage:0},
-				{garage_name:"宜浩佳园",total_parking_spaces: 370,remaining_parking_spaces:0,address:"竹柏路100弄", price: 10.0,status:"full", point:"121.92183|30.907764", isOpen:0, road_garage:0},
-				{garage_name:"宜浩佳园",total_parking_spaces: 296,remaining_parking_spaces:16,address:"竹柏路111弄", price: 10.0,status:"idle", point:"121.919988|30.90592", isOpen:0, road_garage:0}
-				];
-
-
-//移动到当前坐标的位置
+﻿//移动到当前坐标的位置
 var geolocation = new BMap.Geolocation();
 //通过百度地图获取当前位置
 var point = new BMap.Point(121.480241,31.236303);
@@ -50,13 +37,6 @@ function changeProvinces(cityId,areasId, blocksId, parentId){
 				cityId.append(new Option(data[i].name,data[i].code)); 
 			}
 			cityId.prop("disabled", false);
-			/*
-			if(cityId.find("option").length <= 1) { 
-				areasId.prop("disabled", true);
-			}else{
-				areasId.prop("disabled", false);
-			}
-			*/
 		},
 		error: function(){
 			alert ("请求发送失败，请稍候再试");
@@ -76,13 +56,6 @@ function changeCity(areasId, blocksId, parentId){
 				areasId.append(new Option(data[i].name,data[i].code)); 
 			}
 			areasId.prop("disabled", false); 
-			/*
-			if(areasId.find("option").length <= 1) {
-				blocksId.prop("disabled", true); 
-			}else{
-				blocksId.prop("disabled", false); 
-			}
-			*/
 		},
 		error: function(){
 			alert ("请求发送失败，请稍候再试");
@@ -374,13 +347,10 @@ function addMapControl(){
 }
 //创建marker
 function addMarker(){
-	createMarker(roadMarkerArr);
-	createMarker(markerArr);
-	/*
 	$.ajax({
 		type:"GET",
 		dataType:'json',
-		url:"http://yj.wgq.me//parkers.json",
+		url:"http://yj.wgq.me/information/fullInformations.json",
 		success:function(data){
 			createMarker(data);
 		},
@@ -388,29 +358,39 @@ function addMarker(){
 		
 		}
 	});
-	*/
+	
 }
 //更具数组创建marker
 function createMarker(arr){
 	for(var i=0;i<arr.length;i++){
-		var json = arr[i];
-		var p0 = json.point.split("|")[0];
-		var p1 = json.point.split("|")[1];
-		var point = new BMap.Point(p0,p1);
+		//获取information的json
+		var information = arr[i].information;
+		//剩余车位数
+		var remaining_space = arr[i].remaining_space;
+		//显示停车状态
+		var condition  = remaining_space / information.total_parking_space;
+		//alert(typeof(condition) + "-->" + condition);
+		//从information获取经纬度
+		var point = new BMap.Point(information.longitude,information.latitude);
 		//var iconImg = createIcon(json.imgUrl, json.icon);
 		var iconImg;
-		if (json.road_garage == 1) {
-			if(json.status == "idle"){
+		if (information.position == 1) {
+			//TODO 判断状态，这里先写死
+			//iconImg = createIcon("/assets/img/green.png");
+			
+			if(condition >= 0.5 ){
 				iconImg = createIcon("/assets/img/green.png");
-			}else if (json.status == "busy") {
+			}else if (condition < 0.5 && condition >= 0.1) {
 				iconImg = createIcon("/assets/img/orange.png");
-			}else if (json.status == "nervous") {
+			}else if (condition < 0.1 && condition > 0) {
 				iconImg = createIcon("/assets/img/red.png");
 			}else{
 				iconImg = createIcon("/assets/img/gray.png");
 			}
 		}else{
-			if(json.status == "idle"){
+			//TODO 判断状态，这里先写死
+			//iconImg = createIcon("/assets/img/green_p.png");
+			if(remaining_space != 0){
 				iconImg = createIcon("/assets/img/green_p.png");
 			}else{
 				iconImg = createIcon("/assets/img/gray_p.png");
@@ -418,8 +398,9 @@ function createMarker(arr){
 		}
 		var marker = new BMap.Marker(point,{icon:iconImg});
 		var iw = createInfoWindow(i, arr);
-		if (json.road_garage == 1){
-			var label = new BMap.Label(json.remaining_parking_spaces, {offset:new BMap.Size(12, 20)});
+		if (information.position == 1){
+			//剩余车位数，暂时不知道，先写死5
+			var label = new BMap.Label(remaining_space, {offset:new BMap.Size(12, 20)});
 			label.setStyle({
 				color:"yellow",
 				border:"0",
@@ -455,10 +436,12 @@ function createMarker(arr){
 			//两个感叹号的作用就在于，如果明确设置了变量的值
 			//（非null/undifined/0/”“等值),
 			//结果就会根据变量的实际值来返回，如果没有设置，结果就会返回false。
+			/*
 			if(!!json.isOpen){
 				//label.hide();
 				_marker.openInfoWindow(_iw);
 			}
+			*/
 		})()
 	}
 
@@ -466,9 +449,7 @@ function createMarker(arr){
 
 //创建InfoWindow
 function createInfoWindow(i, arr){
-	var json = arr[i];
-	var iw = new BMap.InfoWindow("<b class='iw_poi_title' title='" + json.garage_name
-	+ "'>" + json.garage_name + "</b><div class='iw_poi_content'>"+'价格：'+json.price+'元/小时'+'&nbsp;&nbsp;&nbsp;&nbsp;车位：'+json.remaining_parking_spaces+'/'+json.total_parking_spaces+'<br/>'+'地址：'+json.address+"</div>", {enableMessage:false});
+	var iw = new BMap.InfoWindow(createHtmlStr(i, arr), {enableMessage:false});
 	return iw;
 }
 //创建一个Icon, json
@@ -632,4 +613,29 @@ function getDaysInMonth(year,month){
 	var temp = new Date(year,month,0);
 	return temp.getDate(); 
 } 
+
+//生成点击地图弹出框的html 
+//暂时的剩余车位数不清楚
+function createHtmlStr(i, arr){
+	//获取information的json
+	var information = arr[i].information;
+	//剩余车位数
+	var remaining_space = arr[i].remaining_space;
+	//获取tariff的json数组
+	var tariffs = arr[i].tariff;
+	//获取免费的时间
+	var time_range = tariffs[0].time_range;
+	//获取每小时多少资费
+	var rates = tariffs[1].rates;
+	//获取locality的json数组
+	var localities = arr[i].locality;
+	//获取具体的地址
+	var addr = localities[0].name;
+	var str = "";
+	str = "<b class='iw_poi_title' title='"+information.garage_name+"'>" 
+		+information.garage_name+"</b><div class='iw_poi_content'>"
+		+'价格：前'+time_range+'小时免费,&nbsp;&nbsp;其他' +rates+'元/小时'+'&nbsp;&nbsp;&nbsp;&nbsp;车位：'
+		+remaining_space+'/'+information.total_parking_space+'<br/>'+'地址：'+addr+"</div>";
+	return str;
+}
 

@@ -29,6 +29,10 @@
   <strong>Latitude:</strong>
   <%= @information.latitude %>
 </p>
+<h2>Tariffs</h2>
+<%= render @information.tariffs %>
+<h2>Add a tariff:</h2>
+<%= render "tariffs/form" %>
 
 <%= link_to 'Edit', edit_information_path(@information) %> |
 <%= link_to 'Back', information_index_path %>

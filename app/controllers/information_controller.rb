@@ -63,6 +63,25 @@ class InformationController < ApplicationController
     end
   end
 
+	def fullInformations
+		@ret = []	
+		@information = Information.all
+		@information.each do |information|
+			newret = {}
+			newret[:information] = information
+			@tariff = Tariff.where(information_id: information.id).all	
+			@locality = Locality.where(garageNum: information.uuid)
+			@status = Status.where(garage_num: information.uuid, status: "0").count
+#@event = Event.select(:rom_num).distinct.where(event: "1")
+			newret[:tariff] = @tariff
+			newret[:locality] = @locality
+#			newret[:event] = @event
+			newret[:remaining_space] = @status
+			@ret.push(newret)
+		end
+		 respond_with @ret
+	end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_information

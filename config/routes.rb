@@ -8,7 +8,11 @@ Rails.application.routes.draw do
 # resources :tariffs
 
   resources :information do
+		
 		resources :tariffs
+		collection do
+			get :fullInformations
+		end
 	end
 
   resources :localities 

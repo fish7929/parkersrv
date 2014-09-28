@@ -24,17 +24,18 @@ class TariffsController < ApplicationController
   # POST /tariffs
   # POST /tariffs.json
   def create
-    @tariff = Tariff.new(tariff_params)
-
-    respond_to do |format|
-      if @tariff.save
-        format.html { redirect_to @tariff, notice: 'Tariff was successfully created.' }
-        format.json { render :show, status: :created, location: @tariff }
-      else
-        format.html { render :new }
-        format.json { render json: @tariff.errors, status: :unprocessable_entity }
-      end
-    end
+		@information = Information.find(params[:information_id])
+    @tariff = @information.tariffs.create(tariff_params)
+		redirect_to information_path(@information)
+#    respond_to do |format|
+#     if @tariff.save
+#       format.html { redirect_to @tariff, notice: 'Tariff was successfully created.' }
+#       format.json { render :show, status: :created, location: @tariff }
+#     else
+#       format.html { render :new }
+#       format.json { render json: @tariff.errors, status: :unprocessable_entity }
+#     end
+#   end
   end
 
   # PATCH/PUT /tariffs/1
@@ -69,6 +70,6 @@ class TariffsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def tariff_params
-      params.require(:tariff).permit(:uuid, :time_range, :rates, :information_id)
+      params.require(:tariff).permit(:time_range, :rates)
     end
 end
