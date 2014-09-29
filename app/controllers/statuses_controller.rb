@@ -1,10 +1,12 @@
 class StatusesController < ApplicationController
-  before_action :set_status, only: [:show, :edit, :update, :destroy]
+	respond_to :json, :xml, :html
+	before_action :set_status, only: [:show, :edit, :update, :destroy]
 
   # GET /statuses
   # GET /statuses.json
   def index
     @statuses = Status.all
+		respond_with @statuses
   end
 
   # GET /statuses/1
@@ -61,6 +63,29 @@ class StatusesController < ApplicationController
     end
   end
 	
+	def getFullStatus
+		code = params[:code]
+		parentId = code + "%"
+		@rect = {}
+		@newrect = []
+		if code == "0"
+			@garageNum = Locality.select(:name, :garageNum).where(level: 5).all
+		else
+			@garageNum = Locality.select(:name, :garageNum).where("level = ? AND code like ?", 5, parentId ).all
+		end
+		@maxTotalSpaces = Information.maximum(:total_parking_space)
+		@garageNum.each do |garageNum|
+			detailStatus = {}
+			@singleGarageStatus = Status.where(garage_num: garageNum.garageNum).order(:parking_num).all
+			detailStatus[:status] = @singleGarageStatus
+			detailStatus[:addr] = garageNum.name
+			@newrect.push(detailStatus)
+		end
+		@rect[:maxTotalSpaces] = @maxTotalSpaces
+		@rect[:statuses] = @newrect
+		respond_with @rect
+	end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.

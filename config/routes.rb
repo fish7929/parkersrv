@@ -1,7 +1,11 @@
 Rails.application.routes.draw do
   get 'welcome/index'
 
-  resources :statuses
+  resources :statuses do
+		collection do
+			get :getFullStatus
+		end
+	end
 
   resources :events
 

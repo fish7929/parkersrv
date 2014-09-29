@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140916051003) do
+ActiveRecord::Schema.define(version: 20140929072737) do
 
   create_table "events", force: true do |t|
     t.string   "uuid"
@@ -65,7 +65,7 @@ ActiveRecord::Schema.define(version: 20140916051003) do
   create_table "statuses", force: true do |t|
     t.string   "uuid"
     t.string   "garage_num"
-    t.string   "parking_num"
+    t.integer  "parking_num"
     t.string   "rom_num"
     t.string   "status"
     t.datetime "created_at"
