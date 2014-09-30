@@ -1,9 +1,7 @@
-﻿//移动到当前坐标的位置
+//移动到当前坐标的位置
 var geolocation = new BMap.Geolocation();
 //通过百度地图获取当前位置
 var point = new BMap.Point(121.480241,31.236303);
-
-
 //加载省份信息
 function getProvinces(provincesId, cityId){
 	$.ajax({
@@ -24,9 +22,9 @@ function getProvinces(provincesId, cityId){
 }
 //加载城市信息,改变Provinces下拉框的事件
 function changeProvinces(cityId,areasId, blocksId, parentId){
-	cityId.html ("<option value=\"0000\">(All)</option>");
-	areasId.html ("<option value=\"000000\">(All)</option>");
-	blocksId.html ("<option value=\"00000000\">(All)</option>");
+	cityId.html ("<option value=\"0\">(All)</option>");
+	areasId.html ("<option value=\"0\">(All)</option>");
+	blocksId.html ("<option value=\"0\">(All)</option>");
 	$.ajax({
 		type:"GET",
 		dataType:'json',
@@ -45,8 +43,8 @@ function changeProvinces(cityId,areasId, blocksId, parentId){
 }
 //加载区域信息,改变city下拉框的事件
 function changeCity(areasId, blocksId, parentId){
-	areasId.html ("<option value=\"000000\">(All)</option>");
-	blocksId.html ("<option value=\"00000000\">(All)</option>");
+	areasId.html ("<option value=\"0\">(All)</option>");
+	blocksId.html ("<option value=\"0\">(All)</option>");
 	$.ajax({
 		type:"GET",
 		dataType:'json',
@@ -64,7 +62,7 @@ function changeCity(areasId, blocksId, parentId){
 }
 //加载街道信息改变areas下拉框的事件
 function changeAreas(blocksId, parentId){
-	blocksId.html ("<option value=\"00000000\">(All)</option>");
+	blocksId.html ("<option value=\"0\">(All)</option>");
 	$.ajax({
 		type:"GET",
 		dataType:'json',
@@ -82,10 +80,10 @@ function changeAreas(blocksId, parentId){
 }
 //加载省市区街道信息
 function loadLocalityContent(provinces, city, areas, blocks){
-	provinces.html ("<option value=\"00\">(All)</option>");
-	city.html ("<option value=\"0000\">(All)</option>");
-	areas.html ("<option value=\"000000\">(All)</option>");
-	blocks.html ("<option value=\"00000000\">(All)</option>");
+	provinces.html ("<option value=\"0\">(All)</option>");
+	city.html ("<option value=\"0\">(All)</option>");
+	areas.html ("<option value=\"0\">(All)</option>");
+	blocks.html ("<option value=\"0\">(All)</option>");
 	getProvinces(provinces, city);
 	city.prop("disabled", true);
 	areas.prop("disabled", true);
@@ -97,6 +95,7 @@ $(document).ready(function(){
 	//设置显示当天的时间
 	showCurrentTime($("#mapCurrentTime"));
 	initMap(point);
+	getStatusAjax("0");
 	//显示地图主页
 	setVisibleHeight();
 	//获取位置信息
@@ -136,17 +135,10 @@ $(document).ready(function(){
 		showContent($("#status"));
 		hiddenContent($('#tabOccupancy'));
 		hiddenContent($('#weekStarting'));
+		//从数据库加载状态表的信息
+		getStatusAjax("0");
 		//设置表格背景色 hsl(115, 80%, 60%)   red darkgray
-		$("#occupancyTable td").each(function() {
-			var str = $(this).text();
-			if( str == "空"){
-				setBackgroundColor($(this), "hsl(115, "+"80%"+", 60%)");
-			}else if(str == "忙"){
-				setBackgroundColor($(this), "red");
-			}else{
-				setBackgroundColor($(this), "darkgray");
-			}
-		});
+		
 	});
 	//显示数据分析
 	$("#analytics").click(function(e){
@@ -182,9 +174,6 @@ $(document).ready(function(){
 				}
 			});
 		}
-		
-		
-		
 	});
 	
 	/*查找区域地图*/
@@ -280,6 +269,32 @@ $(document).ready(function(){
 			}
 		}
     });
+	
+	//刷新按钮点击事件
+	$("#refresh").click(function(e){
+		//阻止默认的跳转事件
+		e.preventDefault();
+		var code = "";
+		//获取对应的省市区街道的当前选择的val
+		var proVal =  $("#provinces").val(); 
+		var cityVal =  $("#city").val(); 
+		var areaVal =  $("#areas").val(); 
+		var blockVal =  $("#blocks").val(); 
+		//alert(proVal+"-->"+cityVal+"-->"+areaVal+"-->"+blockVal);
+		//没选择省,不做刷新
+		if (proVal == "0"){
+			return;
+		}else if( proVal != "0" && cityVal == "0"){
+			code = proVal;
+		}else if( cityVal != "0" && areaVal == "0"){
+			code = cityVal;
+		}else if( areaVal != "0" && blockVal == "0"){
+			code = areaVal;
+		}else if(blockVal != "0"){
+			code = blockVal;
+		}
+		getStatusAjax(code);
+	});
 	
 });
 //设置导航栏li的背景色与前景色
@@ -637,5 +652,85 @@ function createHtmlStr(i, arr){
 		+'价格：前'+time_range+'小时免费,&nbsp;&nbsp;其他' +rates+'元/小时'+'&nbsp;&nbsp;&nbsp;&nbsp;车位：'
 		+remaining_space+'/'+information.total_parking_space+'<br/>'+'地址：'+addr+"</div>";
 	return str;
+}
+//通过ajax加载状态
+function getStatusAjax(code){
+	//从数据库加载状态表的信息
+	$.ajax({
+		type:"GET",
+		dataType:'json',
+		url:"/statuses/getFullStatus.json?code="+code,
+		success:function(data){
+			occupancyTableContent(data);
+			setOccupancyTableBackground();
+		},
+		error: function(){
+			alert ("请求发送失败，请稍候再试");
+		}
+	});
+}
+
+//添加表格内容
+function occupancyTableContent(data){
+	//表格列的总数
+	var counts = data.maxTotalSpaces;
+	//先删除所有表头列除了第一列
+	$("#occupancyTable tr th:not(:nth-child(1))").remove();
+	//删除所有的表格内容
+	$("#occupancyTable tbody").remove();
+	
+	//添加表格头
+	for (var count = 1; count <= counts; count++){
+		$("#occupancyTable thead tr").append($("<th>"+count+"</th>"));
+	}
+	//所有状态信息数组形式包含一个json数组和一个地址
+	var statuses = data.statuses;
+	for (var i = 0; i<statuses.length; i++){
+		//添加行
+		var row = $("<tr></tr>"); 
+		//获取状态的json数组
+		var status = statuses[i].status
+		//获取地址
+		var addr = statuses[i].addr;
+		//添加地址
+		var td = $("<td>"+addr+"</td>"); 
+		row.append(td);
+		//添加状态内容
+		for(var j = 0; j < counts; j++){
+			if (counts == status.length){
+				var parkerStatus = status[j].status;	//状态0表示空，1表示占
+				if (parkerStatus == 0){
+					row.append($("<td>空</td>"));
+				}else{
+					row.append($("<td>占</td>"));
+				}
+			}else{
+				if(j < status.length){
+					var parkerStatus = status[j].status;	//状态0表示空，1表示占
+					if (parkerStatus == 0){
+						row.append($("<td>空</td>"));
+					}else{
+						row.append($("<td>占</td>"));
+					}
+				}else{
+					row.append($("<td>缺</td>"));
+				}
+			}
+		}
+		$("#occupancyTable").append(row);
+	}
+}
+//改变占位状态表的背景色
+function setOccupancyTableBackground(){
+	$("#occupancyTable td").each(function() {
+		var str = $(this).text();
+		if( str == "空"){
+			setBackgroundColor($(this), "hsl(115, "+"80%"+", 60%)");
+		}else if(str == "占"){
+			setBackgroundColor($(this), "red");
+		}else{
+			setBackgroundColor($(this), "darkgray");
+		}
+	});	
 }
 
