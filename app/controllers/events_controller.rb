@@ -30,7 +30,7 @@ class EventsController < ApplicationController
 				## update the status table status field, when change the events
 				@status = Status.where("rom_num = ?", @event.rom_num).first
 				if @status != nil
-					@status.update(status: @event.status)
+					@status.update(status: @event.event)
 				end
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render :show, status: :created, location: @event }
