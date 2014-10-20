@@ -8,8 +8,13 @@ class LocalitiesController < ApplicationController
   def index
 		level = params[:level]
 		parentId = params[:parentId]
+
 		if level == nil
 			@localities = Locality.all
+		elsif level == "5"
+			Rails.logger.info "*******ok + level********"
+			parentId = parentId + "%"
+			@localities = Locality.where("level = ? AND parentId like ?", level,  parentId).all
 		else
 #	@localities = Locality.select(:code, :parentId ,:name).where(level: level).all
 			if parentId == nil

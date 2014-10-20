@@ -5,7 +5,13 @@ class InformationController < ApplicationController
   # GET /information
   # GET /information.json
   def index
-    @information = Information.all
+	  my_uuid = params[:uuid]
+		if my_uuid == nil
+
+			@information = Information.all
+		else
+			@information = Information.where(uuid: my_uuid).all
+		end
 		respond_with @information
   end
 
