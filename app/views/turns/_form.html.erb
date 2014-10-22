@@ -1,0 +1,29 @@
+<%= form_for(@turn) do |f| %>
+  <% if @turn.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@turn.errors.count, "error") %> prohibited this turn from being saved:</h2>
+
+      <ul>
+      <% @turn.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :uuid %><br>
+    <%= f.text_field :uuid %>
+  </div>
+  <div class="field">
+    <%= f.label :garage_num %><br>
+    <%= f.text_field :garage_num %>
+  </div>
+  <div class="field">
+    <%= f.label :total_parking_number %><br>
+    <%= f.number_field :total_parking_number %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

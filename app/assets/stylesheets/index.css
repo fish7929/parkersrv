@@ -289,6 +289,18 @@ a{
 }
 
 
+#garageName{
+	display:none;
+}
+
+#dateRange{
+	display:none;
+}
+
+#weekDay {
+	display:none;
+}
+
 /*百度地图*/
 
 .iw_poi_title {

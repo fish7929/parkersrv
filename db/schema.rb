@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140929072737) do
+ActiveRecord::Schema.define(version: 20141021061203) do
 
   create_table "events", force: true do |t|
     t.string   "uuid"
@@ -89,5 +89,35 @@ ActiveRecord::Schema.define(version: 20140929072737) do
   end
 
   add_index "tariffs", ["information_id"], name: "index_tariffs_on_information_id", using: :btree
+
+  create_table "turns", force: true do |t|
+    t.string   "uuid"
+    t.string   "garage_num"
+    t.integer  "total_parking_number"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "velocities", force: true do |t|
+    t.string   "uuid"
+    t.string   "garage_num"
+    t.float    "t_8am",      limit: 24
+    t.float    "t_9am",      limit: 24
+    t.float    "t_10am",     limit: 24
+    t.float    "t_11am",     limit: 24
+    t.float    "t_12pm",     limit: 24
+    t.float    "t_1pm",      limit: 24
+    t.float    "t_2pm",      limit: 24
+    t.float    "t_3pm",      limit: 24
+    t.float    "t_4pm",      limit: 24
+    t.float    "t_5pm",      limit: 24
+    t.float    "t_6pm",      limit: 24
+    t.float    "t_7pm",      limit: 24
+    t.float    "t_8pm",      limit: 24
+    t.float    "t_9pm",      limit: 24
+    t.float    "t_10pm_8am", limit: 24
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Uuid:</strong>
+  <%= @turn.uuid %>
+</p>
+
+<p>
+  <strong>Garage num:</strong>
+  <%= @turn.garage_num %>
+</p>
+
+<p>
+  <strong>Total parking number:</strong>
+  <%= @turn.total_parking_number %>
+</p>
+
+<%= link_to 'Edit', edit_turn_path(@turn) %> |
+<%= link_to 'Back', turns_path %>

@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  uuid: MyString
+  garage_num: MyString
+  total_parking_number: 1
+
+two:
+  uuid: MyString
+  garage_num: MyString
+  total_parking_number: 1

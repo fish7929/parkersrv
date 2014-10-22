@@ -2,6 +2,10 @@
 var geolocation = new BMap.Geolocation();
 //通过百度地图获取当前位置
 var point = new BMap.Point(121.480241,31.236303);
+
+//用来筛选地理位置
+var code = "0";
+
 //加载省份信息
 function getProvinces(provincesId, cityId){
 	$.ajax({
@@ -17,8 +21,7 @@ function getProvinces(provincesId, cityId){
 			alert ("请求发送失败，请稍候再试");
 		}
 	});
-	
-	
+	loadGarageName();
 }
 //加载城市信息,改变Provinces下拉框的事件
 function changeProvinces(cityId,areasId, blocksId, parentId){
@@ -40,6 +43,11 @@ function changeProvinces(cityId,areasId, blocksId, parentId){
 			alert ("请求发送失败，请稍候再试");
 		}
 	});
+	if (parentId == "0"){
+		loadGarageName();
+	}else{
+		linkageGarageName(parentId);
+	}
 }
 //加载区域信息,改变city下拉框的事件
 function changeCity(areasId, blocksId, parentId){
@@ -59,6 +67,11 @@ function changeCity(areasId, blocksId, parentId){
 			alert ("请求发送失败，请稍候再试");
 		}
 	});
+	if (parentId == "0"){
+		linkageGarageName($("#provinces").find('option:selected').val());
+	}else{
+		linkageGarageName(parentId);
+	}
 }
 //加载街道信息改变areas下拉框的事件
 function changeAreas(blocksId, parentId){
@@ -77,6 +90,19 @@ function changeAreas(blocksId, parentId){
 			alert ("请求发送失败，请稍候再试");
 		}
 	});
+	if (parentId == "0"){
+		linkageGarageName($("#citys").find('option:selected').val());
+	}else{
+		linkageGarageName(parentId);
+	}
+}
+//加载车库名称信息改变blocks下拉框的事件
+function changeBlocks(parentId){
+	if (parentId == "0"){
+		linkageGarageName($("#areas").find('option:selected').val());
+	}else{
+		linkageGarageName(parentId);
+	}
 }
 //加载省市区街道信息
 function loadLocalityContent(provinces, city, areas, blocks){
@@ -84,22 +110,80 @@ function loadLocalityContent(provinces, city, areas, blocks){
 	city.html ("<option value=\"0\">(All)</option>");
 	areas.html ("<option value=\"0\">(All)</option>");
 	blocks.html ("<option value=\"0\">(All)</option>");
+	$("#garage_name").html ("<option value=\"0\">(All)</option>");
+	$("#garage_name").html ("<option value=\"0\">(All)</option>");
 	getProvinces(provinces, city);
 	city.prop("disabled", true);
 	areas.prop("disabled", true);
 	blocks.prop("disabled", true);
 }
 
+//加载车库名称信息
+function loadGarageName(){
+	$("#garage_name").html ("<option value=\"0\">(All)</option>");
+	$.ajax({
+		type:"GET",
+		dataType:'json',
+		url:"/information.json",
+		success:function(data){
+			for (var i = 0; i < data.length; i++){
+				$("#garage_name").append(new Option(data[i].garage_name,data[i].uuid));
+			}
+		},
+		error: function(){
+			alert ("请求发送失败，请稍候再试");
+		}
+	});
+
+}
+
+//联动地理位置，改变车库名
+function linkageGarageName(parentId){
+	$("#garage_name").html ("<option value=\"0\">(All)</option>");
+	$.ajax({
+		type:"GET",
+		dataType:'json',
+		url:"/localities.json?level=5&parentId="+parentId,
+		success:function(data){
+			for (var i = 0; i < data.length; i++){
+				var  garageNum =  data[i].garageNum;
+				$.ajax({
+					type:"GET",
+					dataType:'json',
+					url:"/information.json?uuid="+ garageNum,
+					success:function(rep){
+						for (var j = 0; j < rep.length; j++){
+							$("#garage_name").append(new Option(rep[j].garage_name,garageNum)); 
+						}
+					},
+					error: function(){
+						alert ("请求发送失败，请稍候再试");
+					}
+				});
+					
+			}
+		},
+		error: function(){
+			alert ("请求发送失败，请稍候再试");
+		}
+	});
+
+}
+
+
+
 $(document).ready(function(){
 	setVisibleHeight();
 	//设置显示当天的时间
 	showCurrentTime($("#mapCurrentTime"));
 	initMap(point);
-	getStatusAjax("0");
+	getStatusAjax(code);
 	//显示地图主页
 	setVisibleHeight();
 	//获取位置信息
 	loadLocalityContent($("#provinces"), $("#city"), $("#areas"), $("#blocks"));
+	//获取车库名称和UUID
+	//loadGarageName();
 	/*左侧导航栏*/
 	$("#home").click(function(e){
 		revertBackgroundAndColor();
@@ -120,8 +204,7 @@ $(document).ready(function(){
 		setBackgroundAndColor($(this));
 		//设置显示当天的时间
 		showCurrentTime($("#currentTime"));
-		//date range
-		showDateRange();
+		
 		//显示occupancyContent
 		hiddenContent($("#homeContent"));
 		showContent($("#analyticsContent"));
@@ -133,10 +216,13 @@ $(document).ready(function(){
 		hiddenContent($('#analyticsData'));
 		
 		showContent($("#status"));
+		hiddenContent($('#garageName'));
+		hiddenContent($('#dateRange'));
+		hiddenContent($('#weekDay'));
 		hiddenContent($('#tabOccupancy'));
 		hiddenContent($('#weekStarting'));
 		//从数据库加载状态表的信息
-		getStatusAjax("0");
+		getStatusAjax(code);
 		//设置表格背景色 hsl(115, 80%, 60%)   red darkgray
 		
 	});
@@ -147,6 +233,7 @@ $(document).ready(function(){
 		//设置显示当天的时间
 		showCurrentTime($("#currentTime"));
 		//显示日期区间
+		showContent($("#dateRange"));
 		showDateRange();
 		//显示analyticsContent
 		hiddenContent($("#homeContent"));
@@ -161,12 +248,16 @@ $(document).ready(function(){
 		
 		hiddenContent($('#status'));
 		if($("#chart").is(":visible")){
+			showContent($("#garageName"));
 			showContent($("#weekStarting"));
 			hiddenContent($('#tabOccupancy'));
+			hiddenContent($('#weekDay'));
 			showBarCharts();
 		}else if ($("#analytics-occupancy").is(":visible")){
 			showContent($("#tabOccupancy"));
+			showContent($("#weekDay"));
 			hiddenContent($('#weekStarting'));
+			hiddenContent($('#garageName'));
 			//设置表格背景色 hsl(120, 8%, 100%)
 			$("#analyticsTable td").each(function(i, n) {
 				if (i % 16 != 0){
@@ -191,14 +282,19 @@ $(document).ready(function(){
 			showContent($("#chart"));
 			hiddenContent($('#analytics-occupancy'));
 			
+			showContent($("#garageName"));
 			showContent($("#weekStarting"));
 			hiddenContent($('#tabOccupancy'));
+			hiddenContent($('#weekDay'));
 		}else{
 			$("#analyticsData h3").text($(this).find('option:selected').text());
 			hiddenContent($("#chart"));
-			hiddenContent($("#weekStarting"));
 			showContent($("#analytics-occupancy"));
+			
 			showContent($("#tabOccupancy"));
+			showContent($("#weekDay"));
+			hiddenContent($('#weekStarting'));
+			hiddenContent($('#garageName'));
 			//设置表格背景色 hsl(120, 8%, 100%)
 			$("#analyticsTable td").each(function(i, n) {
 				if (i % 16 != 0){
@@ -220,6 +316,9 @@ $(document).ready(function(){
 	$("#areas").change(function(){
 		changeAreas($("#blocks"), $(this).find('option:selected').val());
 	});
+	$("#blocks").change(function(){
+		changeBlocks($(this).find('option:selected').val());
+	});
 	
 	
 	//滑动日期区间，更改label的显示值
@@ -230,61 +329,65 @@ $(document).ready(function(){
 		var date = data.values.min.getDate();
 		var days = getDaysInMonth(year, month);
 		if ( weeKday == 0){
-			$("#firstWeek").text(month+"/"+date+"/"+year);
+			$("#firstWeek").text(date+"/"+month+"/"+year);
 			if (date+7 > days){
-				$("#secondWeek").text((month+1) + "/"+(date+7 - days)+"/"+year);
+				$("#secondWeek").text((date+7 - days) + "/"+(month+1)+"/"+year);
 			}else{
-				$("#secondWeek").text(month + "/"+(date+7)+"/"+year);
+				$("#secondWeek").text((date+7) + "/"+month+"/"+year);
 			}
 			if (date+14 > days){
-				$("#thirdWeek").text((month+1) + "/"+(date+14 - days)+"/"+year);
+				$("#thirdWeek").text((date+14 - days) + "/"+(month+1)+"/"+year);
 			}else{
-				$("#thirdWeek").text(month + "/"+(date+14)+"/"+year);
+				$("#thirdWeek").text((date+14) + "/"+month+"/"+year);
 			}
 			if (date+21 > days){
-				$("#fourthWeek").text((month+1) + "/"+(date+21 - days)+"/"+year);
+				$("#fourthWeek").text((date+21 - days) + "/"+(month+1)+"/"+year);
 			}else{
-				$("#fourthWeek").text(month + "/"+(date+21)+"/"+year);
+				$("#fourthWeek").text((date+21)+ "/"+month +"/"+year);
 			}
 		}else{
 			if(date+7-weeKday > days){
-				$("#firstWeek").text((month+1) + "/"+(date+7-weeKday - days)+"/"+year);
+				$("#firstWeek").text((date+7-weeKday - days) + "/"+(month+1)+"/"+year);
 			}else{
-				$("#firstWeek").text(month + "/"+(date+7-weeKday)+"/"+year);
+				$("#firstWeek").text((date+7-weeKday)+ "/"+month +"/"+year);
 			}
 			if(date+14-weeKday > days){
-				$("#secondWeek").text((month+1) + "/"+(date+14-weeKday - days)+"/"+year);
+				$("#secondWeek").text((date+14-weeKday - days) + "/"+(month+1)+"/"+year);
 			}else{
-				$("#secondWeek").text(month + "/"+(date+14-weeKday)+"/"+year);
+				$("#secondWeek").text((date+14-weeKday)+ "/"+month +"/"+year);
 			}
 			if(date+21-weeKday > days){
-				$("#thirdWeek").text((month+1) + "/"+(date+21-weeKday - days)+"/"+year);
+				$("#thirdWeek").text((date+21-weeKday - days) + "/"+(month+1)+"/"+year);
 			}else{
-				$("#thirdWeek").text(month + "/"+(date+21-weeKday)+"/"+year);
+				$("#thirdWeek").text((date+21-weeKday)+ "/"+month +"/"+year);
 			}
 			if(date+28-weeKday > days){
-				$("#fourthWeek").text((month+1) + "/"+(date+28-weeKday - days)+"/"+year);
+				$("#fourthWeek").text((date+28-weeKday - days) + "/"+(month+1)+"/"+year);
 			}else{
-				$("#fourthWeek").text(month + "/"+(date+28-weeKday)+"/"+year);
+				$("#fourthWeek").text((date+28-weeKday) + "/"+month+"/"+year);
 			}
 		}
     });
 	
 	//刷新按钮点击事件
+	//刷新的时候，分对应不同的页面来刷新不同的内容
 	$("#refresh").click(function(e){
 		//阻止默认的跳转事件
 		e.preventDefault();
-		var code = "";
+		
 		//获取对应的省市区街道的当前选择的val
 		var proVal =  $("#provinces").val(); 
 		var cityVal =  $("#city").val(); 
 		var areaVal =  $("#areas").val(); 
 		var blockVal =  $("#blocks").val(); 
-		//alert(proVal+"-->"+cityVal+"-->"+areaVal+"-->"+blockVal);
-		//没选择省,不做刷新
-		if (proVal == "0"){
-			return;
-		}else if( proVal != "0" && cityVal == "0"){
+		
+		var firstWeek = $("#firstWeek").text();
+		var secondWeek = $("#secondWeek").text();
+		var thirdWeek = $("#thirdWeek").text();
+		var fourthWeek = $("#fourthWeek").text();
+		
+		//设置code的值
+		if( proVal != "0" && cityVal == "0"){
 			code = proVal;
 		}else if( cityVal != "0" && areaVal == "0"){
 			code = cityVal;
@@ -293,10 +396,193 @@ $(document).ready(function(){
 		}else if(blockVal != "0"){
 			code = blockVal;
 		}
-		getStatusAjax(code);
+		
+		//状态显示刷新的
+		if($("#occupancyContent").css("display") == "block"){
+			//没选择省,不做刷新
+			if (proVal == "0"){
+				return;
+			}else{
+				//对应状态页面的时候，只根据地理位置刷新状态页面
+				getStatusAjax(code);
+			}
+		}else if ($("#chart").css("display") == "block"){//周转次数显示刷新
+			alert(firstWeek + "/n" + secondWeek + "/n" + thirdWeek + "/n" +fourthWeek );
+		}else if ($("#analytics-occupancy").css("display") == "block"){//周转率显示刷新
+			
+		}
+		/*
+		//获取对应的车库当前选择的val
+		var garageUuid = "";
+		var garageVal =  $("#garage_name").val(); 
+		if (garageVal == "0"){
+			//return;
+		}else{
+			garageUuid = garageVal;
+		}
+		
+		//获取日期区间选择的最小值和最大值
+		var maxTime = $("#rangeSlider").dateRangeSlider("max").getTime();
+		var minTime = $("#rangeSlider").dateRangeSlider("min").getTime();
+		
+		//获取星期几
+		var weekDay = "";
+		var weekVal = $("#day").val(); 
+		if(weekVal == "0"){
+			
+		}else{
+			weekDay = weekVal;
+		}
+		
+		//对应柱状图的时候，根据：地理位置、车库名称和日期区间来筛选刷新页面。
+		
+		
+		//对应周转率页面的时候，根据：地理位置、日期区间和星期几来筛选刷新页面。
+		*/
 	});
 	
 });
+
+
+//显示柱状图 纵坐标表示停车场日均总停车数/停车场总泊位数
+function showBarCharts(){
+	$.jqplot.config.enablePlugins = true;
+	var s1 = [2, 6, 7, 10, 3, 9, 4];
+	var s2 = [7, 5, 3, 2, 5, 8, 6];
+	var s3 = [4, 1, 8, 9, 7, 6, 5];
+	var s4 = [9, 5, 7, 3, 8, 4, 2];
+	var ticks = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	 
+	plot2 = $.jqplot('chart', [s1, s2, s3, s4], {
+		axesDefaults: {
+			labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+		},
+		seriesDefaults: {
+			renderer:$.jqplot.BarRenderer,
+			pointLabels: { show: true }
+		},
+		axes: {
+			xaxis: {
+				renderer: $.jqplot.CategoryAxisRenderer,
+				ticks: ticks
+			},
+			yaxis: {
+				label: "日均总停车数/总泊位数"
+			}
+		}
+	});
+}
+
+//显示时间区间
+function showDateRange(){
+	var date =  new Date();
+	$("#rangeSlider").dateRangeSlider({
+		bounds:{
+			min: new Date(2014, 7, 22),
+			max: new Date()
+		},
+		defaultValues:{
+			min: new Date(2014, date.getMonth()-1, date.getDate()),
+			max: new Date()
+		},
+		range:{
+			min: {days: -30},
+			max: {days: 30}
+		},
+		/*
+		formatter:function(val){
+			var days = val.getDate();
+			var month = val.getMonth() + 1;
+			var year = val.getFullYear();
+			return month + "/" + days + "/" + year;
+		},
+		*/
+		arrows:false
+	});
+}
+
+
+//通过ajax加载状态
+function getStatusAjax(code){
+	//从数据库加载状态表的信息
+	$.ajax({
+		type:"GET",
+		dataType:'json',
+		url:"/statuses/getFullStatus.json?code="+code,
+		success:function(data){
+			occupancyTableContent(data);
+			setOccupancyTableBackground();
+		},
+		error: function(){
+			alert ("请求发送失败，请稍候再试");
+		}
+	});
+}
+
+//添加表格内容
+function occupancyTableContent(data){
+	//表格列的总数
+	var counts = data.maxTotalSpaces;
+	//先删除所有表头列除了第一列
+	$("#occupancyTable tr th:not(:nth-child(1))").remove();
+	//删除所有的表格内容
+	$("#occupancyTable tbody").remove();
+	
+	//添加表格头
+	for (var count = 1; count <= counts; count++){
+		$("#occupancyTable thead tr").append($("<th>"+count+"</th>"));
+	}
+	//所有状态信息数组形式包含一个json数组和一个地址
+	var statuses = data.statuses;
+	for (var i = 0; i<statuses.length; i++){
+		//添加行
+		var row = $("<tr></tr>"); 
+		//获取状态的json数组
+		var status = statuses[i].status
+		//获取地址
+		var addr = statuses[i].addr;
+		//添加地址
+		var td = $("<td>"+addr+"</td>"); 
+		row.append(td);
+		//添加状态内容
+		for(var j = 0; j < counts; j++){
+			if (counts == status.length){
+				var parkerStatus = status[j].status;	//状态0表示空，1表示占
+				if (parkerStatus == 0){
+					row.append($("<td>空</td>"));
+				}else{
+					row.append($("<td>占</td>"));
+				}
+			}else{
+				if(j < status.length){
+					var parkerStatus = status[j].status;	//状态0表示空，1表示占
+					if (parkerStatus == 0){
+						row.append($("<td>空</td>"));
+					}else{
+						row.append($("<td>占</td>"));
+					}
+				}else{
+					row.append($("<td>缺</td>"));
+				}
+			}
+		}
+		$("#occupancyTable").append(row);
+	}
+}
+//改变占位状态表的背景色
+function setOccupancyTableBackground(){
+	$("#occupancyTable td").each(function() {
+		var str = $(this).text();
+		if( str == "空"){
+			setBackgroundColor($(this), "hsl(115, "+"80%"+", 60%)");
+		}else if(str == "占"){
+			setBackgroundColor($(this), "red");
+		}else{
+			setBackgroundColor($(this), "darkgray");
+		}
+	});	
+}
+
 //设置导航栏li的背景色与前景色
 function setBackgroundAndColor(id){
 	id.css({"background-color":"#fefefe", "color":"hsl(115, 80%, 60%)"});
@@ -548,62 +834,7 @@ function addPositionMarker(point){
 	var mk = new BMap.Marker(point, {icon: myIcon});
 	map.addOverlay(mk);
 }
-//显示柱状图 纵坐标表示停车场日均总停车数/停车场总泊位数
-function showBarCharts(){
-	$.jqplot.config.enablePlugins = true;
-	var s1 = [2, 6, 7, 10, 3, 9, 4];
-	var s2 = [7, 5, 3, 2, 5, 8, 6];
-	var s3 = [4, 1, 8, 9, 7, 6, 5];
-	var s4 = [9, 5, 7, 3, 8, 4, 2];
-	var ticks = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-	 
-	plot2 = $.jqplot('chart', [s1, s2, s3, s4], {
-		axesDefaults: {
-			labelRenderer: $.jqplot.CanvasAxisLabelRenderer
-		},
-		seriesDefaults: {
-			renderer:$.jqplot.BarRenderer,
-			pointLabels: { show: true }
-		},
-		axes: {
-			xaxis: {
-				renderer: $.jqplot.CategoryAxisRenderer,
-				ticks: ticks
-			},
-			yaxis: {
-				label: "日均总停车数/总泊位数"
-			}
-		}
-	});
-}
 
-//显示时间区间
-function showDateRange(){
-	var date =  new Date();
-	$("#rangeSlider").dateRangeSlider({
-		bounds:{
-			min: new Date(2014, 0, 1),
-			max: new Date()
-		},
-		defaultValues:{
-			min: new Date(2014, date.getMonth()-1, date.getDate()),
-			max: new Date()
-		},
-		range:{
-			min: {days: -31},
-			max: {days: 31}
-		},
-		/*
-		formatter:function(val){
-			var days = val.getDate();
-			var month = val.getMonth() + 1;
-			var year = val.getFullYear();
-			return month + "/" + days + "/" + year;
-		},
-		*/
-		arrows:false
-	});
-}
 
 //设置显示当前时间
 function showCurrentTime(id){
@@ -653,84 +884,5 @@ function createHtmlStr(i, arr){
 		+remaining_space+'/'+information.total_parking_space+'<br/>'+'地址：'+addr+"</div>";
 	return str;
 }
-//通过ajax加载状态
-function getStatusAjax(code){
-	//从数据库加载状态表的信息
-	$.ajax({
-		type:"GET",
-		dataType:'json',
-		url:"/statuses/getFullStatus.json?code="+code,
-		success:function(data){
-			occupancyTableContent(data);
-			setOccupancyTableBackground();
-		},
-		error: function(){
-			alert ("请求发送失败，请稍候再试");
-		}
-	});
-}
 
-//添加表格内容
-function occupancyTableContent(data){
-	//表格列的总数
-	var counts = data.maxTotalSpaces;
-	//先删除所有表头列除了第一列
-	$("#occupancyTable tr th:not(:nth-child(1))").remove();
-	//删除所有的表格内容
-	$("#occupancyTable tbody").remove();
-	
-	//添加表格头
-	for (var count = 1; count <= counts; count++){
-		$("#occupancyTable thead tr").append($("<th>"+count+"</th>"));
-	}
-	//所有状态信息数组形式包含一个json数组和一个地址
-	var statuses = data.statuses;
-	for (var i = 0; i<statuses.length; i++){
-		//添加行
-		var row = $("<tr></tr>"); 
-		//获取状态的json数组
-		var status = statuses[i].status
-		//获取地址
-		var addr = statuses[i].addr;
-		//添加地址
-		var td = $("<td>"+addr+"</td>"); 
-		row.append(td);
-		//添加状态内容
-		for(var j = 0; j < counts; j++){
-			if (counts == status.length){
-				var parkerStatus = status[j].status;	//状态0表示空，1表示占
-				if (parkerStatus == 0){
-					row.append($("<td>空</td>"));
-				}else{
-					row.append($("<td>占</td>"));
-				}
-			}else{
-				if(j < status.length){
-					var parkerStatus = status[j].status;	//状态0表示空，1表示占
-					if (parkerStatus == 0){
-						row.append($("<td>空</td>"));
-					}else{
-						row.append($("<td>占</td>"));
-					}
-				}else{
-					row.append($("<td>缺</td>"));
-				}
-			}
-		}
-		$("#occupancyTable").append(row);
-	}
-}
-//改变占位状态表的背景色
-function setOccupancyTableBackground(){
-	$("#occupancyTable td").each(function() {
-		var str = $(this).text();
-		if( str == "空"){
-			setBackgroundColor($(this), "hsl(115, "+"80%"+", 60%)");
-		}else if(str == "占"){
-			setBackgroundColor($(this), "red");
-		}else{
-			setBackgroundColor($(this), "darkgray");
-		}
-	});	
-}
 

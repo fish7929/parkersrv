@@ -1,0 +1,57 @@
+<h1>Listing velocities</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Uuid</th>
+      <th>Garage num</th>
+      <th>T 8am</th>
+      <th>T 9am</th>
+      <th>T 10am</th>
+      <th>T 11am</th>
+      <th>T 12pm</th>
+      <th>T 1pm</th>
+      <th>T 2pm</th>
+      <th>T 3pm</th>
+      <th>T 4pm</th>
+      <th>T 5pm</th>
+      <th>T 6pm</th>
+      <th>T 7pm</th>
+      <th>T 8pm</th>
+      <th>T 9pm</th>
+      <th>T 10pm 8am</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @velocities.each do |velocity| %>
+      <tr>
+        <td><%= velocity.uuid %></td>
+        <td><%= velocity.garage_num %></td>
+        <td><%= velocity.t_8am %></td>
+        <td><%= velocity.t_9am %></td>
+        <td><%= velocity.t_10am %></td>
+        <td><%= velocity.t_11am %></td>
+        <td><%= velocity.t_12pm %></td>
+        <td><%= velocity.t_1pm %></td>
+        <td><%= velocity.t_2pm %></td>
+        <td><%= velocity.t_3pm %></td>
+        <td><%= velocity.t_4pm %></td>
+        <td><%= velocity.t_5pm %></td>
+        <td><%= velocity.t_6pm %></td>
+        <td><%= velocity.t_7pm %></td>
+        <td><%= velocity.t_8pm %></td>
+        <td><%= velocity.t_9pm %></td>
+        <td><%= velocity.t_10pm_8am %></td>
+        <td><%= link_to 'Show', velocity %></td>
+        <td><%= link_to 'Edit', edit_velocity_path(velocity) %></td>
+        <td><%= link_to 'Destroy', velocity, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Velocity', new_velocity_path %>

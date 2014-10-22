@@ -1,4 +1,16 @@
 Rails.application.routes.draw do
+  resources :velocities do
+		collection do
+			get :getFullVelocities
+		end
+	end
+
+  resources :turns do
+		collection do
+			get :getFullTurns
+		end
+	end
+
   get 'welcome/index'
 
   resources :statuses do

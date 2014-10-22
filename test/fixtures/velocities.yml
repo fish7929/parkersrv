@@ -1,0 +1,39 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  uuid: MyString
+  garage_num: MyString
+  t_8am: 1.5
+  t_9am: 1.5
+  t_10am: 1.5
+  t_11am: 1.5
+  t_12pm: 1.5
+  t_1pm: 1.5
+  t_2pm: 1.5
+  t_3pm: 1.5
+  t_4pm: 1.5
+  t_5pm: 1.5
+  t_6pm: 1.5
+  t_7pm: 1.5
+  t_8pm: 1.5
+  t_9pm: 1.5
+  t_10pm_8am: 1.5
+
+two:
+  uuid: MyString
+  garage_num: MyString
+  t_8am: 1.5
+  t_9am: 1.5
+  t_10am: 1.5
+  t_11am: 1.5
+  t_12pm: 1.5
+  t_1pm: 1.5
+  t_2pm: 1.5
+  t_3pm: 1.5
+  t_4pm: 1.5
+  t_5pm: 1.5
+  t_6pm: 1.5
+  t_7pm: 1.5
+  t_8pm: 1.5
+  t_9pm: 1.5
+  t_10pm_8am: 1.5
