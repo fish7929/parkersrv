@@ -5,6 +5,10 @@ var point = new BMap.Point(121.480241,31.236303);
 
 //用来筛选地理位置
 var code = "0";
+//用来筛选车库的
+var garage_uuid = "0";
+
+var plot2 = null;
 
 //加载省份信息
 function getProvinces(provincesId, cityId){
@@ -252,7 +256,7 @@ $(document).ready(function(){
 			showContent($("#weekStarting"));
 			hiddenContent($('#tabOccupancy'));
 			hiddenContent($('#weekDay'));
-			showBarCharts();
+			showBarCharts(code, garage_uuid, $("#firstWeek").text(), $("#secondWeek").text(), $("#thirdWeek").text(), $("#fourthWeek").text());
 		}else if ($("#analytics-occupancy").is(":visible")){
 			showContent($("#tabOccupancy"));
 			showContent($("#weekDay"));
@@ -381,11 +385,6 @@ $(document).ready(function(){
 		var areaVal =  $("#areas").val(); 
 		var blockVal =  $("#blocks").val(); 
 		
-		var firstWeek = $("#firstWeek").text();
-		var secondWeek = $("#secondWeek").text();
-		var thirdWeek = $("#thirdWeek").text();
-		var fourthWeek = $("#fourthWeek").text();
-		
 		//设置code的值
 		if( proVal != "0" && cityVal == "0"){
 			code = proVal;
@@ -397,6 +396,16 @@ $(document).ready(function(){
 			code = blockVal;
 		}
 		
+		//对应四周的周末
+		var firstWeek = $("#firstWeek").text();
+		var secondWeek = $("#secondWeek").text();
+		var thirdWeek = $("#thirdWeek").text();
+		var fourthWeek = $("#fourthWeek").text();
+		
+		//获取车库的UUID值
+		garage_uuid = $("#garage_name").val(); 
+		
+		
 		//状态显示刷新的
 		if($("#occupancyContent").css("display") == "block"){
 			//没选择省,不做刷新
@@ -407,24 +416,11 @@ $(document).ready(function(){
 				getStatusAjax(code);
 			}
 		}else if ($("#chart").css("display") == "block"){//周转次数显示刷新
-			alert(firstWeek + "/n" + secondWeek + "/n" + thirdWeek + "/n" +fourthWeek );
+			showBarCharts(code, garage_uuid, firstWeek, secondWeek, thirdWeek, fourthWeek);
 		}else if ($("#analytics-occupancy").css("display") == "block"){//周转率显示刷新
 			
 		}
 		/*
-		//获取对应的车库当前选择的val
-		var garageUuid = "";
-		var garageVal =  $("#garage_name").val(); 
-		if (garageVal == "0"){
-			//return;
-		}else{
-			garageUuid = garageVal;
-		}
-		
-		//获取日期区间选择的最小值和最大值
-		var maxTime = $("#rangeSlider").dateRangeSlider("max").getTime();
-		var minTime = $("#rangeSlider").dateRangeSlider("min").getTime();
-		
 		//获取星期几
 		var weekDay = "";
 		var weekVal = $("#day").val(); 
@@ -445,14 +441,65 @@ $(document).ready(function(){
 
 
 //显示柱状图 纵坐标表示停车场日均总停车数/停车场总泊位数
-function showBarCharts(){
+function showBarCharts(code, garage_uuid, firstWeek, secondWeek, thirdWeek, fourthWeek){
+	var s1 = [0, 0, 0, 0, 0, 0, 0];
+	var s2 = [0, 0, 0, 0, 0, 0, 0];
+	var s3 = [0, 0, 0, 0, 0, 0, 0];
+	var s4 = [0, 0, 0, 0, 0, 0, 0];
+	$.ajax({
+		type:"GET",
+		dataType:'json',
+		url:"/turns/getFullTurns.json?code="+code + "&garage_uuid="+
+			garage_uuid+"&first_week="+firstWeek+"&second_week="+secondWeek+
+			"&third_week="+thirdWeek+"&four_week="+fourthWeek,
+		success:function(data){
+			for (var i = 0; i < data.length; i++){
+				var totalParking = data[i].totalParking;
+				//以下四组值是个数组
+				var firstContent = data[i].firstContent;
+				for (var j = 0; j < firstContent.length; j++){
+					var totalNumber =  firstContent[j].total_parking_number;
+					s1[j] = (s1[j] + (totalNumber / totalParking))/ (i + 1);
+				}
+				var secondContent = data[i].secondContent;
+				for (var k = 0; k < secondContent.length; k++){
+					var totalNumber =  secondContent[k].total_parking_number;
+					s2[k] = (s2[k] + (totalNumber / totalParking))/ (i + 1);
+				}
+				var thirdContent = data[i].thirdContent;
+				for (var l = 0; l < thirdContent.length; l++){
+					var totalNumber =  thirdContent[l].total_parking_number;
+					s3[l] = (s3[l] + (totalNumber / totalParking))/ (i + 1);
+				}
+				var fourContent = data[i].fourContent;
+				for (var m = 0; m < fourContent.length; m++){
+					var totalNumber =  fourContent[m].total_parking_number;
+					s4[m] = (s4[m] + (totalNumber / totalParking))/ (i + 1);
+				}
+			}
+			createBarCharts(s1, s2, s3, s4);
+		},
+		error: function(){
+			alert ("请求发送失败，请稍候再试");
+		}
+	});
+	
+}
+//生成柱状图(先清空防止重叠或者溢出)
+function createBarCharts(s1, s2, s3, s4){
+	if (plot2){
+		plot2.destroy(); 
+		$("#chart").empty();
+		plot2 = null;
+		initBarCharts(s1, s2, s3, s4);
+	}else{
+		initBarCharts(s1, s2, s3, s4);
+	}
+}
+
+function initBarCharts(s1, s2, s3, s4){
 	$.jqplot.config.enablePlugins = true;
-	var s1 = [2, 6, 7, 10, 3, 9, 4];
-	var s2 = [7, 5, 3, 2, 5, 8, 6];
-	var s3 = [4, 1, 8, 9, 7, 6, 5];
-	var s4 = [9, 5, 7, 3, 8, 4, 2];
 	var ticks = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-	 
 	plot2 = $.jqplot('chart', [s1, s2, s3, s4], {
 		axesDefaults: {
 			labelRenderer: $.jqplot.CanvasAxisLabelRenderer
