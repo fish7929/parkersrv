@@ -283,9 +283,9 @@ a{
 .colorRange{
 	width: 120px;
 	/*颜色渐变在不同的浏览器写法*/
-	background:-webkit-linear-gradient(left,hsl(120, 8%, 100%),hsl(120, 95%, 50%));/*new gradient for Webkit*/
-	background:-o-linear-gradient(left,hsl(120, 8%, 100%),hsl(120, 95%, 50%)); /*Opera11*/
-	background:-moz-linear-gradient(left,hsl(120, 8%, 100%),hsl(120, 95%, 50%));/*Mozilla*/
+	background:-webkit-linear-gradient(left,hsl(120, 8%, 50%),hsl(120, 95%, 50%));/*new gradient for Webkit*/
+	background:-o-linear-gradient(left,hsl(120, 8%, 50%),hsl(120, 95%, 50%)); /*Opera11*/
+	background:-moz-linear-gradient(left,hsl(120, 8%, 50%),hsl(120, 95%, 50%));/*Mozilla*/
 }
 
 

@@ -64,7 +64,21 @@ class VelocitiesController < ApplicationController
   end
 
 	def getFullVelocities
-
+		code = params[:code]
+		parentId = code + "%"
+		start_date = params[:start_date].to_date
+		end_date = params[:end_date].to_date + 1.day
+		week_day = params[:week_day].to_i
+		@rect = []
+		if code == "0"
+			@garageNum = Locality.select(:garageNum).where(level: 5).all
+		else
+			@garageNum = Locality.select(:garageNum).where("level = ? AND code like ?", 5, parentId).all
+		end
+		@garageNum.each do |garageNum|
+			get_content(garageNum.garageNum, start_date, end_date, week_day)
+		end
+		respond_with @rect
 	end
 
   private
@@ -77,4 +91,25 @@ class VelocitiesController < ApplicationController
     def velocity_params
       params.require(:velocity).permit(:garage_num, :t_8am, :t_9am, :t_10am, :t_11am, :t_12pm, :t_1pm, :t_2pm, :t_3pm, :t_4pm, :t_5pm, :t_6pm, :t_7pm, :t_8pm, :t_9pm, :t_10pm_8am)
     end
+		
+		def get_content(garage_uuid, start_date, end_date, week_day)
+			detailContent = {}
+			@information = Information.find_by("uuid = ?", garage_uuid)
+			detailContent[:totalParking] = @information.total_parking_space
+			detailContent[:garageName] = @information.garage_name
+			if week_day == 7
+				@veloc = Velocity.where("garage_num = ? AND created_at >= ? AND created_at <= ?", garage_uuid, start_date, end_date)
+				detailContent[:velocityContent] = @veloc
+			else
+				velocContent = []
+				@veloc = Velocity.where("garage_num = ? AND created_at >= ? AND created_at <= ?", garage_uuid, start_date, end_date)
+				@veloc.each do |veloc|
+					if veloc.created_at.wday == week_day
+							velocContent.push(veloc)
+					end
+				end
+				detailContent[:velocityContent] = velocContent
+			end
+			@rect.push(detailContent)
+		end
 end

@@ -7,6 +7,11 @@ var point = new BMap.Point(121.480241,31.236303);
 var code = "0";
 //用来筛选车库的
 var garage_uuid = "0";
+//获取星期几
+var weekVal = "";
+//筛选日期的开始和结束日期
+var start_date = "22/9/2014";
+var end_date = "21/10/2014";
 
 var plot2 = null;
 
@@ -262,12 +267,16 @@ $(document).ready(function(){
 			showContent($("#weekDay"));
 			hiddenContent($('#weekStarting'));
 			hiddenContent($('#garageName'));
+			
+			getVelocities(code, start_date, end_date, weekVal);
+			/*
 			//设置表格背景色 hsl(120, 8%, 100%)
 			$("#analyticsTable td").each(function(i, n) {
 				if (i % 16 != 0){
 					setBackgroundColor($(this),"hsl(120,"+$(this).text()+", 50%)");
 				}
 			});
+			*/
 		}
 	});
 	
@@ -299,12 +308,15 @@ $(document).ready(function(){
 			showContent($("#weekDay"));
 			hiddenContent($('#weekStarting'));
 			hiddenContent($('#garageName'));
+			getVelocities(code, start_date, end_date, weekVal);
+			/*
 			//设置表格背景色 hsl(120, 8%, 100%)
 			$("#analyticsTable td").each(function(i, n) {
 				if (i % 16 != 0){
 					setBackgroundColor($(this),"hsl(120, "+$(this).text()+", 50%)")
 				}
 			});
+			*/
 		}
 	});
 	
@@ -404,7 +416,13 @@ $(document).ready(function(){
 		
 		//获取车库的UUID值
 		garage_uuid = $("#garage_name").val(); 
-		
+		//获取星期几
+		weekVal = $("#day").val(); 
+		//获取选中筛选月份的最小和最大值
+		var minDate = $("#rangeSlider").dateRangeSlider("min");
+		var maxDate = $("#rangeSlider").dateRangeSlider("max");
+		start_date = minDate.getDate()+"/"+(minDate.getMonth()+1)+"/"+minDate.getFullYear();
+		end_date = maxDate.getDate()+"/"+(maxDate.getMonth()+1)+"/"+maxDate.getFullYear();
 		
 		//状态显示刷新的
 		if($("#occupancyContent").css("display") == "block"){
@@ -418,27 +436,12 @@ $(document).ready(function(){
 		}else if ($("#chart").css("display") == "block"){//周转次数显示刷新
 			showBarCharts(code, garage_uuid, firstWeek, secondWeek, thirdWeek, fourthWeek);
 		}else if ($("#analytics-occupancy").css("display") == "block"){//周转率显示刷新
-			
-		}
-		/*
-		//获取星期几
-		var weekDay = "";
-		var weekVal = $("#day").val(); 
-		if(weekVal == "0"){
-			
-		}else{
-			weekDay = weekVal;
+			getVelocities(code, start_date, end_date, weekVal);
 		}
 		
-		//对应柱状图的时候，根据：地理位置、车库名称和日期区间来筛选刷新页面。
-		
-		
-		//对应周转率页面的时候，根据：地理位置、日期区间和星期几来筛选刷新页面。
-		*/
 	});
 	
 });
-
 
 //显示柱状图 纵坐标表示停车场日均总停车数/停车场总泊位数
 function showBarCharts(code, garage_uuid, firstWeek, secondWeek, thirdWeek, fourthWeek){
@@ -483,8 +486,8 @@ function showBarCharts(code, garage_uuid, firstWeek, secondWeek, thirdWeek, four
 			alert ("请求发送失败，请稍候再试");
 		}
 	});
-	
 }
+
 //生成柱状图(先清空防止重叠或者溢出)
 function createBarCharts(s1, s2, s3, s4){
 	if (plot2){
@@ -548,6 +551,117 @@ function showDateRange(){
 	});
 }
 
+function getVelocities(code, start_date, end_date, weekVal){
+	//从数据库加载周转率表的信息
+	$.ajax({ 
+		type:"GET",
+		dataType:'json',
+		url:"/velocities/getFullVelocities.json?code="+code+"&start_date="+start_date+
+			"&end_date="+end_date+"&week_day="+weekVal,
+		success:function(data){
+			analyticsTableContent(data);
+		},
+		error: function(){
+			alert ("请求发送失败，请稍候再试");
+		}
+	});
+}
+//添加周转率表格内容
+function analyticsTableContent(data){
+	//删除所有的表格内容
+	$("#analyticsTable tbody").remove();
+	for (var i = 0; i < data.length; i++){
+		//添加行
+		var row = $("<tr></tr>"); 
+		//停车总数
+		var totalCounts = data[i].totalParking;
+		//停车库名称
+		var garageName = data[i].garageName;
+		//周转率内容
+		var velocContent = data[i].velocityContent;
+		//总条数
+		var counts = velocContent.length;
+		//处理对应的每列表格中
+		var t_8am = 0;
+		var t_9am = 0;
+		var t_10am = 0;
+		var t_11am = 0;
+		var t_12pm = 0;
+		var t_1pm = 0;
+		var t_2pm = 0;
+		var t_3pm = 0;
+		var t_4pm = 0;
+		var t_5pm = 0;
+		var t_6pm = 0;
+		var t_7pm = 0;
+		var t_8pm = 0;
+		var t_9pm = 0;
+		var t_10pm_8am = 0;
+		for (var j = 0; j < counts; j++){
+			var veloc = velocContent[j];
+			t_8am += velocContent[j].t_8am / totalCounts;
+			t_9am += velocContent[j].t_9am / totalCounts;
+			t_10am += velocContent[j].t_10am / totalCounts;
+			t_11am += velocContent[j].t_11am / totalCounts;
+			t_12pm += velocContent[j].t_12pm / totalCounts;
+			t_1pm += velocContent[j].t_1pm / totalCounts;
+			t_2pm += velocContent[j].t_2pm / totalCounts;
+			t_3pm += velocContent[j].t_3pm / totalCounts;
+			t_4pm += velocContent[j].t_4pm / totalCounts;
+			t_5pm += velocContent[j].t_5pm / totalCounts;
+			t_6pm += velocContent[j].t_6pm / totalCounts;
+			t_7pm += velocContent[j].t_7pm / totalCounts;
+			t_8pm += velocContent[j].t_8pm / totalCounts;
+			t_9pm += velocContent[j].t_9pm / totalCounts;
+			t_10pm_8am += velocContent[j].t_10pm_8am / (totalCounts*10);
+		}
+		t_8am = ((t_8am / counts) * 100).toFixed(0);
+		t_9am = ((t_9am / counts) * 100).toFixed(0);
+		t_10am = ((t_10am / counts) * 100).toFixed(0);
+		t_11am = ((t_11am / counts) * 100).toFixed(0);
+		t_12pm = ((t_12pm / counts) * 100).toFixed(0);
+		t_1pm = ((t_1pm / counts) * 100).toFixed(0);
+		t_2pm = ((t_2pm / counts) * 100).toFixed(0);
+		t_3pm = ((t_3pm / counts) * 100).toFixed(0);
+		t_4pm = ((t_4pm / counts) * 100).toFixed(0);
+		t_5pm = ((t_5pm / counts) * 100).toFixed(0);
+		t_6pm = ((t_6pm / counts) * 100).toFixed(0);
+		t_7pm = ((t_7pm / counts) * 100).toFixed(0);
+		t_8pm = ((t_8pm / counts) * 100).toFixed(0);
+		t_9pm = ((t_9pm / counts) * 100).toFixed(0);
+		t_10pm_8am = ((t_10pm_8am / counts) * 100).toFixed(0);
+		
+		//添加车库名称
+		row.append($("<td>"+garageName+"</td>"));
+		row.append($("<td>"+t_8am+"%</td>"));
+		row.append($("<td>"+t_9am+"%</td>"));
+		row.append($("<td>"+t_10am+"%</td>"));
+		row.append($("<td>"+t_11am+"%</td>"));
+		row.append($("<td>"+t_12pm+"%</td>"));
+		row.append($("<td>"+t_1pm+"%</td>"));
+		row.append($("<td>"+t_2pm+"%</td>"));
+		row.append($("<td>"+t_3pm+"%</td>"));
+		row.append($("<td>"+t_4pm+"%</td>"));
+		row.append($("<td>"+t_5pm+"%</td>"));
+		row.append($("<td>"+t_6pm+"%</td>"));
+		row.append($("<td>"+t_7pm+"%</td>"));
+		row.append($("<td>"+t_8pm+"%</td>"));
+		row.append($("<td>"+t_9pm+"%</td>"));
+		row.append($("<td>"+t_10pm_8am+"%</td>"));
+		$("#analyticsTable").append(row);
+	}
+	setanalyticsTableBackground();
+}
+
+function setanalyticsTableBackground(){
+	//设置表格背景色 hsl(120, 8%, 100%)
+	$("#analyticsTable td").each(function(i, n) {
+		if (i % 16 != 0){
+			setBackgroundColor($(this),"hsl(120, "+$(this).text()+", 50%)")
+		}
+	});
+
+}
 
 //通过ajax加载状态
 function getStatusAjax(code){
@@ -566,7 +680,7 @@ function getStatusAjax(code){
 	});
 }
 
-//添加表格内容
+//添加状态表格内容
 function occupancyTableContent(data){
 	//表格列的总数
 	var counts = data.maxTotalSpaces;
