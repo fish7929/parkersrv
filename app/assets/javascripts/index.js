@@ -10,8 +10,12 @@ var garage_uuid = "0";
 //获取星期几
 var weekVal = "";
 //筛选日期的开始和结束日期
-var start_date = "22/9/2014";
-var end_date = "21/10/2014";
+var date = new Date();
+var start_date = date.getDate()+"/"+(date.getMonth() + 1)+"/"+date.getFullYear();
+//30天之前			
+var lastMonth = new Date(date.getTime() - (30*24*60*60*1000));
+var end_date = lastMonth.getDate()+"/"+(lastMonth.getMonth() + 1)+"/"+lastMonth.getFullYear();
+
 
 var plot2 = null;
 
@@ -193,6 +197,7 @@ $(document).ready(function(){
 	loadLocalityContent($("#provinces"), $("#city"), $("#areas"), $("#blocks"));
 	//获取车库名称和UUID
 	//loadGarageName();
+	$("#mapCanvas").focus();
 	/*左侧导航栏*/
 	$("#home").click(function(e){
 		revertBackgroundAndColor();
@@ -206,6 +211,7 @@ $(document).ready(function(){
 		showContent($("#homeContent"));
 		
 		initMap(point);
+		$("#mapCanvas").focus();
 	});
 	//显示停车空闲数据
 	$("#occupancy").click(function(e){
